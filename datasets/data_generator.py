@@ -82,6 +82,8 @@ class DataGenerator(object):
     def get_datagenerators(self):
         """
         """
+        self._trvd_config['directory'] = (DataGenerator.base_path
+            + self._trvd_config['directory'])
         self.parse_train_dataframe()
         self._train_df, self._valid_df = train_test_split(
             self._df, test_size=0.15

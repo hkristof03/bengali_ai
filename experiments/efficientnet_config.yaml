@@ -15,7 +15,7 @@ preprocess:
     horizontal_flip: False    # randomly flip images
     vertical_flip: False    # randomly flip images
   train_valid_generator:
-    directory: '/home/hkristof/data_D/Kaggle/Bengali/data/images/images'
+    directory: '/datasets/train_images/'
     x_col: 'image_id'
     y_col:
       - grapheme_root
