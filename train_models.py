@@ -43,7 +43,7 @@ class NeuralNetTrainer(object):
     def train(self):
         """
         """
-        # if cross_valid:
+        # if cross_valid: seed??
         self._datagen = DataGenerator(**self._preprocess_config)
         train_gen, valid_gen = self._datagen.get_datagenerators()
         step_size_train = train_gen.n / train_gen.batch_size
