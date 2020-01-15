@@ -27,7 +27,7 @@ def process_parquet_files(train=True, nprocess=10):
         df = pd.read_parquet(file)
         df_parquet = pd.concat([df_parquet, df], axis=0)
 
-    df_split = np.array_split(train_df, nprocess)
+    df_split = np.array_split(df_parquet, nprocess)
 
     def save_images(df, path_save):
         for index, row in tqdm(df.iterrows()):
