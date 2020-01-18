@@ -67,7 +67,7 @@ callbacks:
     save_best_only: True
     mode: 'auto'
   csvlog:
-    filename: '/artifacts/efficientnet/'
+    filename: '/artifacts/resnet50/'
   experiment_name: 'resnet50_first'         # Modify this for new log files!
 
 train:
