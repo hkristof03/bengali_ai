@@ -90,11 +90,10 @@ class NeuralNetTrainer(object):
                     row_ids.append('Test_' + str(j) + ':' + tgt_cols[k])
                     targets.append(np.argmax(preds[k][j]))
 
-        submit_df = pd.DataFrame({
-            'row_id': row_ids,
-            'target': targets,
+        submit_df = pd.DataFrame(
+            {'row_id': row_ids, 'target': targets}
             columns=['row_id', 'target']
-        })
+        )
         path_save_pred = NeuralNetTrainer.base_path
             + '/datasets/predictions/'
             + self._callbacks_config['experiment_name']
