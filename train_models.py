@@ -91,7 +91,7 @@ class NeuralNetTrainer(object):
                     targets.append(np.argmax(preds[k][j]))
 
         submit_df = pd.DataFrame(
-            {'row_id': row_ids, 'target': targets}
+            {'row_id': row_ids, 'target': targets},
             columns=['row_id', 'target']
         )
         path_save_pred = NeuralNetTrainer.base_path
