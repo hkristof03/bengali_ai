@@ -30,10 +30,14 @@ class DataGenerator(object):
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     def __init__(self, **kwargs):
-        self._path_train_df = DataGenerator.base_path + kwargs.get('path_train_df')
+        self._path_train_df = self.base_path + kwargs.get('path_train_df')
+        self._path_test_df = self.base_path + kwargs.get('path_test_df')
         self._dummies = kwargs.get('dummies')
         self._datagen_config = kwargs.get('datagen_config')
         self._trvd_config = kwargs.get('train_valid_generator')
+        self._trvd_config['directory'] = (DataGenerator.base_path
+            + self._trvd_config['directory'])
+        self._test_config = kwargs.get('test_generator')
         self._df = None
         self._train_df = None
         self._valid_df = None
@@ -79,11 +83,17 @@ class DataGenerator(object):
         else:
             del self._df['grapheme']
 
-    def get_datagenerators(self):
+    def parse_test_dataframe(self):
         """
         """
-        self._trvd_config['directory'] = (DataGenerator.base_path
-            + self._trvd_config['directory'])
+        self._df_test = pd.read_csv(self._path_test_df)
+        self._df_test['image_id'] = self._df_test['image_id'].apply(
+            lambda x: x + '.jpg'
+        )
+
+    def get_datagenerators_train(self):
+        """
+        """
         self.parse_train_dataframe()
         self._train_df, self._valid_df = train_test_split(
             self._df, test_size=0.15
@@ -92,12 +102,26 @@ class DataGenerator(object):
             **self._datagen_config, rescale=1.0/255.0,
         )
         train_generator = datagen.flow_from_dataframe(
-            self._train_df, target_size=(137, 236), **self._trvd_config
+            self._train_df, **self._trvd_config
         )
         valid_generator = datagen.flow_from_dataframe(
-            self._valid_df, target_size=(137, 236), **self._trvd_config
+            self._valid_df, **self._trvd_config
         )
         return train_generator, valid_generator
+
+    def get_datagenerators_test(self):
+        """
+        """
+        self.parse_test_dataframe()
+        datagen = ImageDataGenerator(
+            **self._datagen_config, rescale=1.0/255.0
+        )
+        test_generator = datagen.flow_from_directory(**self._test_config)
+
+        return test_generator
+
+
+
 
 
 if __name__ == '__main__':

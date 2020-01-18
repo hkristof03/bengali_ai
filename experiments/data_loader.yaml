@@ -1,5 +1,6 @@
 ---
 path_train_df: '/datasets/train_data/train.csv'
+path_test_df: '/datasets/train_data/test.csv'
 
 dummies: True
 
@@ -17,12 +18,21 @@ datagen_config:
   vertical_flip: False    # randomly flip images
 
 train_valid_generator:
-  directory: '/home/hkristof/data_D/Kaggle/Bengali/data/images/images'
+  directory: '/data/train_images/'
   x_col: 'image_id'
   y_col:
     - grapheme_root
     - vowel_diacritic
     - consonant_diacritic
   class_mode: 'multi_output'
-  batch_size: 256
-  color_mode: 'grayscale'
+  batch_size: 64
+  color_mode: 'rgb'
+  target_size: !!python/tuple [137, 236]
+
+test_generator:
+  directory: '/data/test_images/'
+  target_size: !!python/tuple [137, 236]
+  shuffle: False
+  class_mode: None
+  batch_size: 1
+  seed: 7

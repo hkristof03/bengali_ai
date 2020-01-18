@@ -1,6 +1,7 @@
 ---
 preprocess:
   path_train_df: '/datasets/train_data/train.csv'
+  path_test_df: '/datasets/train_data/test.csv'
   dummies: True
   datagen_config:
     featurewise_center: False    # set input mean to 0 over the dataset
@@ -24,9 +25,16 @@ preprocess:
     class_mode: 'multi_output'
     batch_size: 64
     color_mode: 'rgb'
+  test_generator:
+    directory: '/data/test_images/'
+    target_size: !!python/tuple [137, 236]
+    shuffle: False
+    class_mode: None
+    batch_size: 1
+#    seed: 7              # Can be used in Test-Time Augmentation?
 
 model:
-  base_model: 'efficientnetb3'
+  base_model: 'reset50'
   input_shape: !!python/tuple [137, 236, 3]
   metrics:
     root: 'accuracy'
@@ -60,8 +68,16 @@ callbacks:
     mode: 'auto'
   csvlog:
     filename: '/artifacts/efficientnet/'
-
-  experiment_name: 'efficientnetb3_first'
+  experiment_name: 'resnet50_first'         # Modify this for new log files!
 
 train:
   epochs: 30
+  test_code: True
+  kfold: False
+  nfolds: 10
+  holdout: False
+  holdout_size: 0.1
+
+test:
+  tta: False
+  tta_steps: 5

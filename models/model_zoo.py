@@ -41,7 +41,36 @@ def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
             weights='imagenet',
             input_shape=input_shape
         )
+    if base_model == 'efficientnetb0':
+        from keras_efficientnets import EfficientNetB3
+        base_model = EfficientNetB3(
+            include_top=False,
+            weights='imagenet',
+            input_shape=input_shape
+        )
+    if base_model == 'efficientnetb1':
+        from keras_efficientnets import EfficientNetB3
+        base_model = EfficientNetB3(
+            include_top=False,
+            weights='imagenet',
+            input_shape=input_shape
+        )
+    if base_model == 'efficientnetb2':
+        from keras_efficientnets import EfficientNetB3
+        base_model = EfficientNetB3(
+            include_top=False,
+            weights='imagenet',
+            input_shape=input_shape
+        )
+
     if base_model == 'efficientnetb3':
+        from keras_efficientnets import EfficientNetB3
+        base_model = EfficientNetB3(
+            include_top=False,
+            weights='imagenet',
+            input_shape=input_shape
+        )
+    if base_model == 'efficientnetb4':
         from keras_efficientnets import EfficientNetB3
         base_model = EfficientNetB3(
             include_top=False,
