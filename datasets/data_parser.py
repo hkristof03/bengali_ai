@@ -39,10 +39,10 @@ def parse_args():
     )
     return parser.parse_args()
 
-def crop_image(img, threshold=220, maxval=255, resize_size=256):
+def crop_image(img, threshold=30, maxval=255, resize_size=256):
     """
     """
-    _, thresh = cv2.threshold(img, 30, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    _, thresh = cv2.threshold(img, threshold, maxval, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     contours, _ = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)[-2:]
 
     idx = 0
