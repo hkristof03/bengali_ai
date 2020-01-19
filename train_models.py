@@ -86,6 +86,7 @@ class NeuralNetTrainer(object):
             results = model.evaluate_generator(
                 holdout_datagen, steps=step_size_holdout
             )
+            results = [float(i) for i in results]
             d = dict(zip(metrics_names, results))
             self._config_all['results'] = d
             path_results = (self.base_path + '/datasets/predictions/' +

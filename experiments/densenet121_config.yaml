@@ -51,7 +51,7 @@ preprocess:
   #    seed: 7              # Can be used in Test-Time Augmentation?
 
 model:
-  base_model: 'efficientnetb2'
+  base_model: 'densenet121'
   input_shape: !!python/tuple [128, 128, 3]
   metrics:
     root: 'accuracy'
@@ -84,13 +84,13 @@ callbacks:
     save_best_only: True
     mode: 'auto'
   csvlog:
-    filename: '/artifacts/efficientnet/'
-  experiment_name: 'efficientnetb2_first'         # Modify this for new log files!
+    filename: '/artifacts/densenet121/'
+  experiment_name: 'densenet121_first'         # Modify this for new log files!
 
 train:
   epochs: 30
 
-test_code: True
+test_code: False
 
 test:
   tta: False
