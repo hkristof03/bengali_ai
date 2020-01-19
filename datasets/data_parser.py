@@ -39,48 +39,33 @@ def parse_args():
     )
     return parser.parse_args()
 
-def get_pad_width(im, new_shape, is_rgb=True):
-    pad_diff = new_shape - im.shape[0], new_shape - im.shape[1]
-    t, b = math.floor(pad_diff[0]/2), math.ceil(pad_diff[0]/2)
-    l, r = math.floor(pad_diff[1]/2), math.ceil(pad_diff[1]/2)
-    if is_rgb:
-        pad_width = ((t,b), (l,r), (0, 0))
-    else:
-        pad_width = ((t,b), (l,r))
-    return pad_width
-
-def crop_object(img, thresh=220, maxval=255, square=True):
+def crop_image(img, threshold=220, maxval=255, resize_size=256):
     """
-    Source: https://stackoverflow.com/questions/49577973/how-to-crop-the-biggest-object-in-image-with-python-opencv
     """
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # convert to grayscale
-    # threshold to get just the signature (INVERTED)
-    retval, thresh_gray = cv2.threshold(
-        gray, thresh=thresh, maxval=maxval, type=cv2.THRESH_BINARY_INV
-    )
-    contours, hierarchy = cv2.findContours(
-        thresh_gray,cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
-    )
-    # Find object with the biggest bounding box
-    mx = (0,0,0,0)      # biggest bounding box so far
-    mx_area = 0
-    for cont in contours:
-        x,y,w,h = cv2.boundingRect(cont)
-        area = w*h
-        if area > mx_area:
-            mx = x,y,w,h
-            mx_area = area
-    x,y,w,h = mx
+    _, thresh = cv2.threshold(img, 30, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    contours, _ = cv2.findContours(thresh,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)[-2:]
 
-    crop = img[y:y+h, x:x+w]
+    idx = 0
+    ls_xmin = []
+    ls_ymin = []
+    ls_xmax = []
+    ls_ymax = []
+    for cnt in contours:
+        idx += 1
+        x,y,w,h = cv2.boundingRect(cnt)
+        ls_xmin.append(x)
+        ls_ymin.append(y)
+        ls_xmax.append(x + w)
+        ls_ymax.append(y + h)
+    xmin = min(ls_xmin)
+    ymin = min(ls_ymin)
+    xmax = max(ls_xmax)
+    ymax = max(ls_ymax)
 
-    if square:
-        pad_width = get_pad_width(crop, max(crop.shape))
-        crop = np.pad(
-            crop, pad_width=pad_width, mode='constant', constant_values=255
-        )
+    img = img[ymin:ymax,xmin:xmax]
+    img = cv2.resize(img, (resize_size, resize_size))
 
-    return crop
+    return img
 
 def save_images(df, path_save, crop=False):
     """
@@ -89,7 +74,7 @@ def save_images(df, path_save, crop=False):
         label = df.loc[index].values[0]
         data = df.loc[index].values[1:].reshape(137, 236).astype('uint8')
         if crop:
-            data = crop_object(data)
+            data = crop_image(data)
         cv2.imwrite(path_save + f'{label}.jpg', data)
 
 def process_parquet_files(train=True, nprocess=10, crop=False):

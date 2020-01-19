@@ -34,7 +34,7 @@ preprocess:
 #    seed: 7              # Can be used in Test-Time Augmentation?
 
 model:
-  base_model: 'reset50'
+  base_model: 'resnet50'
   input_shape: !!python/tuple [137, 236, 3]
   metrics:
     root: 'accuracy'

@@ -94,10 +94,10 @@ class NeuralNetTrainer(object):
             {'row_id': row_ids, 'target': targets},
             columns=['row_id', 'target']
         )
-        path_save_pred = NeuralNetTrainer.base_path
+        path_save_pred = (NeuralNetTrainer.base_path
             + '/datasets/predictions/'
             + self._callbacks_config['experiment_name']
-            + '.csv'
+            + '.csv')
         submit_df.to_csv(path_save_pred)
 
 
