@@ -62,7 +62,7 @@ class NeuralNetTrainer(object):
             callbacks=self._callbacks,
             **self._train_config
         )
-        self.predict(model)
+        self.predict_holdout(model)
 
     def predict_holdout(self, model):
         """

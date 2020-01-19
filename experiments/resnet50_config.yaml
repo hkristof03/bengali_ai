@@ -72,8 +72,8 @@ callbacks:
     factor: 0.5
     min_lr: 0.00001
   earlystop:
-    monitor: 'val_root_accuracy'
-    patience: 30
+    monitor: 'val_root_acc'
+    patience: 15
     min_delta: 0
     verbose: 1
     mode: 'auto'
@@ -87,7 +87,7 @@ callbacks:
 
 train:
   epochs: 30
-  
+
 test_code: True
 
 test:
