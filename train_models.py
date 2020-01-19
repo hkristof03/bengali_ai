@@ -19,6 +19,7 @@ class NeuralNetTrainer(object):
         self._callbacks_config = kwargs.get('callbacks')
         self._train_config = kwargs.get('train')
         self._test_config = kwargs.get('test')
+        self._test_code = kwargs.get('test_code')
         self._datagen = None
         self._callbacks = None
 
@@ -44,7 +45,7 @@ class NeuralNetTrainer(object):
     def train(self):
         """
         """
-        if self._train_config['test_code'] == True:
+        if self._test_code == True:
             self._train_config['epochs'] = 1
         # if cross_valid: seed??
         self._datagen = DataGenerator(**self._preprocess_config)
@@ -63,15 +64,15 @@ class NeuralNetTrainer(object):
         )
         self.predict(model)
 
-    def predict(self, model):
+    def predict_holdout(self, model):
         """
         """
         tgt_cols = ['grapheme_root','vowel_diacritic','consonant_diacritic']
         row_ids = []
         targets = []
-        test_datagen = self._datagen.get_datagenerators_test()
-        filenames = test_datagen.filenames
-        step_size_test = test_datagen.n / test_datagen.batch_size
+        holdout_datagen = self._datagen.get_datagenerator_holdout()
+        filenames = holdout_datagen.filenames
+        step_size_holdout = holdout_datagen.n / holdout_datagen.batch_size
         if self._test_config['tta']:
             predictions = []
             tta_steps = self._test_config['tta_steps']
@@ -83,7 +84,7 @@ class NeuralNetTrainer(object):
             # To be continued...
         else:
             preds = model.predict_generator(
-                test_datagen, steps=step_size_test, verbose=1
+                holdout_datagen, steps=step_size_holdout, verbose=1
             )
             for j in range(filenames):
                 for k in range(3):
@@ -97,7 +98,7 @@ class NeuralNetTrainer(object):
         path_save_pred = (NeuralNetTrainer.base_path
             + '/datasets/predictions/'
             + self._callbacks_config['experiment_name']
-            + '.csv')
+            + '_predictions.csv')
         submit_df.to_csv(path_save_pred)
 
 

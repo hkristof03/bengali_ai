@@ -33,14 +33,23 @@ class DataGenerator(object):
         self._path_train_df = self.base_path + kwargs.get('path_train_df')
         self._path_test_df = self.base_path + kwargs.get('path_test_df')
         self._dummies = kwargs.get('dummies')
+        self._holdout = kwargs.get('holdout')
+        self._holdout_size = kwargs.get('holdout_size')
+        self._seed = kwargs.get('seed')
         self._datagen_config = kwargs.get('datagen_config')
         self._trvd_config = kwargs.get('train_valid_generator')
-        self._trvd_config['directory'] = (DataGenerator.base_path
+        self._trvd_config['directory'] = (self.base_path
             + self._trvd_config['directory'])
+        self._holdout_config = kwargs.get('holdout_generator')
+        self._holdout_config['directory'] = (self.base_path
+            + self._holdout_config['directory'])
         self._test_config = kwargs.get('test_generator')
+        self._test_config['directory'] = (self.base_path
+            + self._test_config['directory'])
         self._df = None
         self._train_df = None
         self._valid_df = None
+        self._holdout_df = None
 
     def parse_train_dataframe(self):
         """
@@ -95,6 +104,12 @@ class DataGenerator(object):
         """
         """
         self.parse_train_dataframe()
+        if self._holdout:
+            self._holdout_df = self._df.sample(
+                frac=self._holdout_size, random_state=self._seed
+            )
+            self._df = self._df[~self._df.index.isin(self._holdout_df.index)]
+
         self._train_df, self._valid_df = train_test_split(
             self._df, test_size=0.15
         )
@@ -109,7 +124,17 @@ class DataGenerator(object):
         )
         return train_generator, valid_generator
 
-    def get_datagenerators_test(self):
+    def get_datagenerator_holdout(self):
+        """
+        """
+        if self._holdout:
+            datagen = ImageDataGenerator(**self._datagen_config, rescale=1.0/255.0)
+            holdout_datagen = datagen.flow_from_dataframe(
+                self._holdout_df, **self._holdout_config
+            )
+            return holdout_datagen
+
+    def get_datagenerator_test(self):
         """
         """
         self.parse_test_dataframe()
@@ -121,14 +146,16 @@ class DataGenerator(object):
         return test_generator
 
 
-
-
-
 if __name__ == '__main__':
     args = parse_args()
     path_yaml = DataGenerator.base_path + args.pyaml
     configs = parse_yaml(path_yaml)
 
     dg = DataGenerator(**configs)
-    tg, vg = dg.get_datagenerators()
-    print(dg._df)
+    tg, vg = dg.get_datagenerators_train()
+    hg = dg.get_datagenerator_holdout()
+    #tg = dg.get_datagenerator_test()   TO be implemented correctly
+    print(f'Total train DataFrame shape is: {dg._df.shape}')
+    print(f'Holdout DataFrame shape is: {dg._holdout_df.shape}')
+    print(f'Train DataFrame shape is: {dg._train_df.shape}')
+    print(f'Validation DataFrame shape is: {dg._valid_df.shape}')
