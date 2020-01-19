@@ -1,0 +1,97 @@
+---
+preprocess:
+  path_train_df: '/datasets/train_data/train.csv'
+  path_test_df: '/datasets/train_data/test.csv'
+  dummies: True
+  holdout: True
+  holdout_size: 0.2
+  seed: 2020
+  datagen_config:
+    featurewise_center: False    # set input mean to 0 over the dataset
+    samplewise_center: False    # set each sample mean to 0
+    featurewise_std_normalization: False    # divide inputs by std of the dataset
+    samplewise_std_normalization: False    # divide each input by its std
+    zca_whitening: False    # apply ZCA whitening
+    rotation_range: 0    # randomly rotate images in the range (degrees, 0 to 180)
+    zoom_range: 0.0    # Randomly zoom image
+    width_shift_range: 0.0    # randomly shift images horizontally (fraction of total width)
+    height_shift_range: 0.0    # randomly shift images vertically (fraction of total height)
+    horizontal_flip: False    # randomly flip images
+    vertical_flip: False    # randomly flip images
+  train_valid_generator:
+    directory: '/datasets/train_images_cropped/'
+    x_col: 'image_id'
+    y_col:
+      - grapheme_root
+      - vowel_diacritic
+      - consonant_diacritic
+    class_mode: 'multi_output'
+    batch_size: 64
+    color_mode: 'rgb'
+    target_size: !!python/tuple [128, 128]
+    shuffle: True
+  holdout_generator:
+    directory: '/datasets/train_images_cropped/'
+    x_col: 'image_id'
+    y_col:
+      - grapheme_root
+      - vowel_diacritic
+      - consonant_diacritic
+    class_mode: 'multi_output'
+    batch_size: 64
+    color_mode: 'rgb'
+    target_size: !!python/tuple [128, 128]
+    shuffle: False
+  test_generator:
+    directory: '/data/test_images/'
+    target_size: !!python/tuple [137, 236]
+    shuffle: False
+    class_mode: None
+    batch_size: 1
+  #    seed: 7              # Can be used in Test-Time Augmentation?
+
+model:
+  base_model: 'efficientnetb2'
+  input_shape: !!python/tuple [128, 128, 3]
+  metrics:
+    root: 'accuracy'
+    vowel: 'accuracy'
+    consonant: 'accuracy'
+  loss:
+    root: 'categorical_crossentropy'
+    vowel: 'categorical_crossentropy'
+    consonant: 'categorical_crossentropy'
+  loss_weights:                              # Tunable!!
+    root: 0.333
+    vowel: 0.333
+    consonant: 0.333
+
+callbacks:
+  reducelr:
+    monitor: 'val_root_loss'
+    patience: 3
+    verbose: 1
+    factor: 0.5
+    min_lr: 0.00001
+  earlystop:
+    monitor: 'val_root_acc'
+    patience: 15
+    min_delta: 0
+    verbose: 1
+    mode: 'auto'
+  modelcp:
+    filepath: '/datasets/saved_models/'
+    save_best_only: True
+    mode: 'auto'
+  csvlog:
+    filename: '/artifacts/efficientnet/'
+  experiment_name: 'efficientnetb2_first'         # Modify this for new log files!
+
+train:
+  epochs: 30
+
+test_code: True
+
+test:
+  tta: False
+  tta_steps: 5

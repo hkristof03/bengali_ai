@@ -25,7 +25,7 @@ def parse_yaml(path_yaml):
 
 def dump_dict_yaml(yaml_dict, path_yaml):
     with open(path_yaml, 'w') as f:
-        yaml.dump(yaml_dict)
+        yaml.dump(yaml_dict, f)
 
 
 class DataGenerator(object):
