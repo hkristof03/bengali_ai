@@ -23,6 +23,10 @@ def parse_yaml(path_yaml):
         configs = yaml.load(stream.read(), Loader=yaml.Loader)
         return configs
 
+def dump_dict_yaml(yaml_dict, path_yaml):
+    with open(path_yaml, 'w') as f:
+        yaml.dump(yaml_dict)
+
 
 class DataGenerator(object):
     """

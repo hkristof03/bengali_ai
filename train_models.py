@@ -4,7 +4,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
 
-from datasets.data_generator import parse_args, parse_yaml, DataGenerator
+from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
+    DataGenerator)
 from models.model_zoo import build_model
 
 
@@ -14,6 +15,7 @@ class NeuralNetTrainer(object):
     base_path = os.path.dirname(os.path.abspath(__file__))
 
     def __init__(self, **kwargs):
+        self._config_all = kwargs   # to store the whole config file and write out with results
         self._preprocess_config = kwargs.get('preprocess')
         self._model_config = kwargs.get('model')
         self._callbacks_config = kwargs.get('callbacks')
@@ -67,13 +69,9 @@ class NeuralNetTrainer(object):
     def predict_holdout(self, model):
         """
         """
-        tgt_cols = ['grapheme_root','vowel_diacritic','consonant_diacritic']
-        row_ids = []
-        targets = []
         holdout_datagen = self._datagen.get_datagenerator_holdout()
         filenames = holdout_datagen.filenames
         step_size_holdout = holdout_datagen.n / holdout_datagen.batch_size
-        result = model.evaluate_generator(holdout_datagen, steps=step_size_holdout)
         if self._test_config['tta']:
             predictions = []
             tta_steps = self._test_config['tta_steps']
@@ -84,6 +82,25 @@ class NeuralNetTrainer(object):
                 predictions.append(preds)
             # To be continued...
         else:
+            metrics_names = model.metrics_names
+            results = model.evaluate_generator(
+                holdout_datagen, steps=step_size_holdout
+            )
+            d = dict(zip(metrics_names, results))
+            self._config_all['results'] = d
+            path_results = (self.base_path + '/datasets/predictions/' +
+                self._callbacks_config['experiment_name'] + '.yaml')
+            dump_dict_yaml(self._config_all, path_results)
+
+
+    def predict_test(self):
+        """
+        tgt_cols = ['grapheme_root','vowel_diacritic','consonant_diacritic']
+        row_ids = []
+        targets = []
+        if self._test_config['tta']
+            pass
+        else:
             preds = model.predict_generator(
                 holdout_datagen, steps=step_size_holdout, verbose=1
             )
@@ -91,7 +108,6 @@ class NeuralNetTrainer(object):
                 for k in range(3):
                     row_ids.append('Test_' + str(j) + ':' + tgt_cols[k])
                     targets.append(np.argmax(preds[k][j]))
-
         submit_df = pd.DataFrame(
             {'row_id': row_ids, 'target': targets},
             columns=['row_id', 'target']
@@ -101,6 +117,9 @@ class NeuralNetTrainer(object):
             + self._callbacks_config['experiment_name']
             + '_predictions.csv')
         submit_df.to_csv(path_save_pred)
+        """
+        # ..... to be continued
+
 
 
 if __name__ == '__main__':
