@@ -73,6 +73,7 @@ class NeuralNetTrainer(object):
         holdout_datagen = self._datagen.get_datagenerator_holdout()
         filenames = holdout_datagen.filenames
         step_size_holdout = holdout_datagen.n / holdout_datagen.batch_size
+        result = model.evaluate_generator(holdout_datagen, steps=step_size_holdout)
         if self._test_config['tta']:
             predictions = []
             tta_steps = self._test_config['tta_steps']
@@ -86,7 +87,7 @@ class NeuralNetTrainer(object):
             preds = model.predict_generator(
                 holdout_datagen, steps=step_size_holdout, verbose=1
             )
-            for j in range(filenames):
+            for file in filenames:
                 for k in range(3):
                     row_ids.append('Test_' + str(j) + ':' + tgt_cols[k])
                     targets.append(np.argmax(preds[k][j]))

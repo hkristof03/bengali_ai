@@ -29,6 +29,7 @@ preprocess:
     batch_size: 64
     color_mode: 'rgb'
     target_size: !!python/tuple [128, 128]
+    shuffle: True
   holdout_generator:
     directory: '/datasets/train_images_cropped/'
     x_col: 'image_id'
@@ -40,6 +41,7 @@ preprocess:
     batch_size: 64
     color_mode: 'rgb'
     target_size: !!python/tuple [128, 128]
+    shuffle: False
   test_generator:
     directory: '/data/test_images/'
     target_size: !!python/tuple [137, 236]
