@@ -28,7 +28,7 @@ preprocess:
     class_mode: 'multi_output'
     batch_size: 64
     color_mode: 'rgb'
-    target_size: !!python/tuple [128, 128]
+    target_size: !!python/tuple [200, 200]
     shuffle: True
   holdout_generator:
     directory: '/datasets/train_images_cropped/'
@@ -40,7 +40,7 @@ preprocess:
     class_mode: 'multi_output'
     batch_size: 64
     color_mode: 'rgb'
-    target_size: !!python/tuple [128, 128]
+    target_size: !!python/tuple [200, 200]
     shuffle: False
   test_generator:
     directory: '/data/test_images/'
@@ -52,7 +52,7 @@ preprocess:
 
 model:
   base_model: 'densenet121'
-  input_shape: !!python/tuple [128, 128, 3]
+  input_shape: !!python/tuple [200, 200, 3]
   metrics:
     root: 'accuracy'
     vowel: 'accuracy'
@@ -85,7 +85,7 @@ callbacks:
     mode: 'auto'
   csvlog:
     filename: '/artifacts/densenet121/'
-  experiment_name: 'densenet121_lossweight'         # Modify this for new log files!
+  experiment_name: 'densenet121_200x200'         # Modify this for new log files!
 
 train:
   epochs: 30

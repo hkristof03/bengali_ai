@@ -28,7 +28,7 @@ preprocess:
     class_mode: 'multi_output'
     batch_size: 64
     color_mode: 'rgb'
-    target_size: !!python/tuple [128, 128]
+    target_size: !!python/tuple [200, 200]
     shuffle: True
   holdout_generator:
     directory: '/datasets/train_images_cropped/'
@@ -40,7 +40,7 @@ preprocess:
     class_mode: 'multi_output'
     batch_size: 64
     color_mode: 'rgb'
-    target_size: !!python/tuple [128, 128]
+    target_size: !!python/tuple [200, 200]
     shuffle: False
   test_generator:
     directory: '/data/test_images/'
@@ -52,7 +52,7 @@ preprocess:
 
 model:
   base_model: 'efficientnetb3'
-  input_shape: !!python/tuple [128, 128, 3]
+  input_shape: !!python/tuple [200, 200, 3]
   metrics:
     root: 'accuracy'
     vowel: 'accuracy'
@@ -62,9 +62,9 @@ model:
     vowel: 'categorical_crossentropy'
     consonant: 'categorical_crossentropy'
   loss_weights:                              # Tunable!!
-    root: 0.5
-    vowel: 0.25
-    consonant: 0.25
+    root: 0.8
+    vowel: 0.1
+    consonant: 0.1
 
 callbacks:
   reducelr:
@@ -85,7 +85,7 @@ callbacks:
     mode: 'auto'
   csvlog:
     filename: '/artifacts/efficientnet/'
-  experiment_name: 'efficientnetb3_lossweight'         # Modify this for new log files!
+  experiment_name: 'efficientnetb3_200x200'         # Modify this for new log files!
 
 train:
   epochs: 30
