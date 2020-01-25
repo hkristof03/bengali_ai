@@ -62,9 +62,9 @@ model:
     vowel: 'categorical_crossentropy'
     consonant: 'categorical_crossentropy'
   loss_weights:                              # Tunable!!
-    root: 0.8
-    vowel: 0.1
-    consonant: 0.1
+    root: 0.33
+    vowel: 0.33
+    consonant: 0.33
 
 callbacks:
   reducelr:
@@ -85,10 +85,10 @@ callbacks:
     mode: 'auto'
   csvlog:
     filename: '/artifacts/resnet50/'
-  experiment_name: 'resnet50_aug'         # Modify this for new log files!
+  experiment_name: 'resnet50_aug2'         # Modify this for new log files!
 
 train:
-  epochs: 50
+  epochs: 100
 
 test_code: False
 
