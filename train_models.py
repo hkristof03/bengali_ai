@@ -56,7 +56,7 @@ class NeuralNetTrainer(object):
         step_size_valid = valid_gen.n / valid_gen.batch_size
         self.get_callbacks()
 
-        metrics_d = {'root': Recall, 'vowel': Recall, 'consonant': Recall}
+        metrics_d = {'metrics': {'root': Recall(), 'vowel': Recall(), 'consonant': Recall()}}
 
         model = build_model(**self._model_config, metrics=metrics_d)
         train_history = model.fit_generator(
