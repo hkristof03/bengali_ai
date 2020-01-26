@@ -3,11 +3,11 @@ import os
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
+from tensorflow.keras.metrics import Recall
 
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
     DataGenerator)
 from models.model_zoo import build_model
-from metrics import recall
 
 class NeuralNetTrainer(object):
     """
@@ -56,7 +56,7 @@ class NeuralNetTrainer(object):
         step_size_valid = valid_gen.n / valid_gen.batch_size
         self.get_callbacks()
 
-        metrics_d = {'root': recall, 'vowel': recall, 'consonant': recall}
+        metrics_d = {'root': Recall, 'vowel': Recall, 'consonant': Recall}
 
         model = build_model(**self._model_config, metrics=metrics_d)
         train_history = model.fit_generator(
