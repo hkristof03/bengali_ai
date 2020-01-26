@@ -7,7 +7,7 @@ from keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
     DataGenerator)
 from models.model_zoo import build_model
-
+from metrics import recall
 
 class NeuralNetTrainer(object):
     """

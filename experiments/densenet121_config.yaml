@@ -54,9 +54,9 @@ model:
   base_model: 'densenet121'
   input_shape: !!python/tuple [200, 200, 3]
   metrics:
-    root: 'accuracy'
-    vowel: 'accuracy'
-    consonant: 'accuracy'
+    root: recall
+    vowel: recall
+    consonant: recall
   loss:
     root: 'categorical_crossentropy'
     vowel: 'categorical_crossentropy'
@@ -75,7 +75,7 @@ callbacks:
     min_lr: 0.00001
   earlystop:
     monitor: 'val_root_acc'
-    patience: 15
+    patience: 10
     min_delta: 0
     verbose: 1
     mode: 'auto'

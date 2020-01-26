@@ -75,7 +75,7 @@ callbacks:
     min_lr: 0.00001
   earlystop:
     monitor: 'val_root_acc'
-    patience: 15
+    patience: 10
     min_delta: 0
     verbose: 1
     mode: 'auto'
