@@ -1,5 +1,6 @@
 import os
 
+import pandas as pd
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
