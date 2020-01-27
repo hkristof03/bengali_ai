@@ -53,7 +53,7 @@ preprocess:
 
 model:
   base_model: 'efficientnetb2'
-  input_shape: !!python/tuple [200, 200, 200]
+  input_shape: !!python/tuple [200, 200, 3]
 #  metrics:
 #    root: 'accuracy'
 #    vowel: 'accuracy'
