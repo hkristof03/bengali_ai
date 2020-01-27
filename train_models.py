@@ -56,7 +56,14 @@ class NeuralNetTrainer(object):
         step_size_valid = valid_gen.n / valid_gen.batch_size
         self.get_callbacks()
 
-        metrics_d = {'metrics': {'root': Recall(), 'vowel': Recall(), 'consonant': Recall()}}
+        metrics_d = {
+            'metrics':
+                {
+                    'root': Recall(name='root_recall'),
+                    'vowel': Recall(name='vowel_recall'),
+                    'consonant': Recall(name='consonant_recall')
+                }
+        }
 
         model = build_model(**self._model_config, metrics=metrics_d)
         train_history = model.fit_generator(
@@ -86,6 +93,7 @@ class NeuralNetTrainer(object):
             # To be continued...
         else:
             metrics_names = model.metrics_names
+            print(metrics_names)
             results = model.evaluate_generator(
                 holdout_datagen, steps=step_size_holdout
             )
@@ -95,6 +103,15 @@ class NeuralNetTrainer(object):
             path_results = (self.base_path + '/datasets/predictions/' +
                 self._callbacks_config['experiment_name'] + '.yaml')
             dump_dict_yaml(self._config_all, path_results)
+
+            # Get arrays of predictions for later analysis
+            results = model.predict_generator(
+                holdout_datagen, steps=step_size_holdout
+            )
+            d = dict(zip(metrics_names, results))
+            df_pred = pd.DataFrame(d)
+            df_pred = pd.concat([holdout_datagen._holdout_df, df_pred], axis=1)
+            print(df_pred)
 
 
     def predict_test(self):
