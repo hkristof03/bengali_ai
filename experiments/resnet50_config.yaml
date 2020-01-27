@@ -53,10 +53,10 @@ preprocess:
 model:
   base_model: 'resnet50'
   input_shape: !!python/tuple [200, 200, 3]
-  metrics:
-    root: 'accuracy'
-    vowel: 'accuracy'
-    consonant: 'accuracy'
+#  metrics:
+#    root: 'accuracy'
+#    vowel: 'accuracy'
+#    consonant: 'accuracy'
   loss:
     root: 'categorical_crossentropy'
     vowel: 'categorical_crossentropy'
