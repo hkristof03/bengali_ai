@@ -79,6 +79,7 @@ class NeuralNetTrainer(object):
         """
         """
         holdout_datagen = self._datagen.get_datagenerator_holdout()
+        print(holdout_datagen.classes)
         filenames = holdout_datagen.filenames
         step_size_holdout = holdout_datagen.n / holdout_datagen.batch_size
         if self._test_config['tta']:
@@ -125,7 +126,7 @@ class NeuralNetTrainer(object):
             }
             df_pred = pd.DataFrame.from_dict(d)
             df_pred = pd.concat([self._datagen._holdout_df, df_pred], axis=1)
-            print(df_pred)
+            #print(df_pred)
 
 
     def predict_test(self):
