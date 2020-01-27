@@ -5,7 +5,7 @@ import pandas as pd
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
-from tensorflow.keras.metrics import Recall
+from tensorflow.keras.metrics import Recall, Precision
 
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
     DataGenerator)
@@ -59,9 +59,9 @@ class NeuralNetTrainer(object):
         self.get_callbacks()
 
         metrics_d = {
-            'root': Recall(name='recall'),
-            'vowel': Recall(name='recall'),
-            'consonant': Recall(name='recall')
+            'root': [Recall(name='recall'), Precision(name='precision')],
+            'vowel': [Recall(name='recall'), Precision(name='precision')],
+            'consonant': [Recall(name='recall'), Precision(name='precision')]
         }
 
         model = build_model(**self._model_config, metrics=metrics_d)
@@ -92,8 +92,8 @@ class NeuralNetTrainer(object):
                 predictions.append(preds)
             # To be continued...
         else:
+            """
             metrics_names = model.metrics_names
-            print(metrics_names)
             results = model.evaluate(
                 holdout_datagen, steps=step_size_holdout
             )
@@ -103,7 +103,8 @@ class NeuralNetTrainer(object):
             path_results = (self.base_path + '/datasets/predictions/' +
                 self._callbacks_config['experiment_name'] + '.yaml')
             dump_dict_yaml(self._config_all, path_results)
-
+            """
+            print(self._datagen._holdout_df.head(20))
             # Get arrays of predictions for later analysis
             results = model.predict(
                 holdout_datagen, steps=step_size_holdout
@@ -115,9 +116,6 @@ class NeuralNetTrainer(object):
             root_pred = [np.argmax(i) for i in root_pred]
             vowel_pred = [np.argmax(i) for i in vowel_pred]
             consonant_pred = [np.argmax(i) for i in consonant_pred]
-            #print(root_pred)
-            #print(vowel_pred)
-            #print(consonant_pred)
 
             d = {
                 'root_pred': root_pred,
