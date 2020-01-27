@@ -98,6 +98,10 @@ class NeuralNetTrainer(object):
             )
             results = [float(i) for i in results]
             d = dict(zip(metrics_names, results))
+            scores = [
+                d['root_recall'], d['vowel_recall'], d['consonant_recall']
+            ]
+            d['hier_macro_avg_recall'] = np.average(scores, weights=[2,1,1])
             self._config_all['results'] = d
             path_results = (self.base_path
                 + self._test_config['path_save_config']
