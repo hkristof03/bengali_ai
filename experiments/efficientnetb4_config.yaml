@@ -49,22 +49,23 @@ preprocess:
     class_mode: None
     batch_size: 1
   #    seed: 7              # Can be used in Test-Time Augmentation?
+  cutmix: False
 
 model:
   base_model: 'efficientnetb4'
   input_shape: !!python/tuple [200, 200, 3]
-  metrics:
-    root: 'accuracy'
-    vowel: 'accuracy'
-    consonant: 'accuracy'
+#  metrics:
+#    root: 'accuracy'
+#    vowel: 'accuracy'
+#    consonant: 'accuracy'
   loss:
     root: 'categorical_crossentropy'
     vowel: 'categorical_crossentropy'
     consonant: 'categorical_crossentropy'
   loss_weights:                              # Tunable!!
-    root: 0.33
-    vowel: 0.33
-    consonant: 0.33
+    root: 0.6
+    vowel: 0.2
+    consonant: 0.2
 
 callbacks:
   reducelr:
@@ -74,7 +75,7 @@ callbacks:
     factor: 0.5
     min_lr: 0.00001
   earlystop:
-    monitor: 'val_root_acc'
+    monitor: 'val_root_recall'
     patience: 10
     min_delta: 0
     verbose: 1
@@ -85,13 +86,15 @@ callbacks:
     mode: 'auto'
   csvlog:
     filename: '/artifacts/efficientnet/'
-  experiment_name: 'efficientnetb4_aug'         # Modify this for new log files!
+  experiment_name: 'efficientnetb4_recall'         # Modify this for new log files!
 
 train:
   epochs: 100
 
-test_code: False
+test_code: True
 
 test:
   tta: False
   tta_steps: 5
+  path_save_config: '/datasets/predictions_config/'
+  path_predictions: '/datasets/predictions/'

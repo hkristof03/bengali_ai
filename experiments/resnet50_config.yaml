@@ -49,7 +49,7 @@ preprocess:
     class_mode: None
     batch_size: 1
   #    seed: 7              # Can be used in Test-Time Augmentation?
-  cutmix: True    # Use cutmix augmentation
+  cutmix: False    # Use cutmix augmentation
 
 model:
   base_model: 'resnet50'
@@ -63,9 +63,9 @@ model:
     vowel: 'categorical_crossentropy'
     consonant: 'categorical_crossentropy'
   loss_weights:                              # Tunable!!
-    root: 0.33
-    vowel: 0.33
-    consonant: 0.33
+    root: 0.6
+    vowel: 0.2
+    consonant: 0.2
 
 callbacks:
   reducelr:
@@ -89,9 +89,9 @@ callbacks:
   experiment_name: 'resnet50_recall'         # Modify this for new log files!
 
 train:
-  epochs: 30
+  epochs: 100
 
-test_code: True
+test_code: False
 
 test:
   tta: False
