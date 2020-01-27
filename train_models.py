@@ -92,7 +92,7 @@ class NeuralNetTrainer(object):
         else:
             metrics_names = model.metrics_names
             print(metrics_names)
-            results = model.evaluate_generator(
+            results = model.evaluate(
                 holdout_datagen, steps=step_size_holdout
             )
             results = [float(i) for i in results]
@@ -103,9 +103,11 @@ class NeuralNetTrainer(object):
             dump_dict_yaml(self._config_all, path_results)
 
             # Get arrays of predictions for later analysis
-            results = model.predict_generator(
+            results = model.predict(
                 holdout_datagen, steps=step_size_holdout
             )
+            print(results)
+            print(results.shape)
             d = dict(zip(metrics_names, results))
             df_pred = pd.DataFrame.from_dict(d)
             df_pred = pd.concat([holdout_datagen._holdout_df, df_pred], axis=1)
