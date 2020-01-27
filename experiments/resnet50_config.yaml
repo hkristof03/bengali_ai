@@ -85,12 +85,12 @@ callbacks:
     mode: 'auto'
   csvlog:
     filename: '/artifacts/resnet50/'
-  experiment_name: 'resnet50_aug2'         # Modify this for new log files!
+  experiment_name: 'resnet50_recall'         # Modify this for new log files!
 
 train:
   epochs: 100
 
-test_code: False
+test_code: True
 
 test:
   tta: False
