@@ -1,8 +1,8 @@
 import os
 
 import pandas as pd
-from keras.preprocessing.image import ImageDataGenerator
-from keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
 from tensorflow.keras.metrics import Recall
 

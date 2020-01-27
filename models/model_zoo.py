@@ -1,10 +1,10 @@
 import os
 import argparse
 
-from keras.models import Model
-from keras.layers import (Dense, Conv2D, Flatten, MaxPool2D, GlobalAvgPool2D,
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import (Dense, Conv2D, Flatten, MaxPool2D, GlobalAvgPool2D,
     Dropout, BatchNormalization, Input)
-from keras.optimizers import Adam
+from tensorflow.keras.optimizers import Adam
 
 import yaml
 
@@ -28,36 +28,36 @@ def parse_yaml(path_yaml):
 def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
 
     if base_model == 'resnet50':
-        from keras.applications import  ResNet50
+        from tensorflow.keras.applications import  ResNet50
         base_model = ResNet50(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
         )
     if base_model == 'densenet121':
-        from keras.applications import DenseNet121
+        from tensorflow.keras.applications import DenseNet121
         base_model = DenseNet121(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
         )
     if base_model == 'efficientnetb0':
-        from keras_efficientnets import EfficientNetB3
-        base_model = EfficientNetB3(
+        from keras_efficientnets import EfficientNetB0
+        base_model = EfficientNetB0(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
         )
     if base_model == 'efficientnetb1':
-        from keras_efficientnets import EfficientNetB3
-        base_model = EfficientNetB3(
+        from keras_efficientnets import EfficientNetB1
+        base_model = EfficientNetB1(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
         )
     if base_model == 'efficientnetb2':
-        from keras_efficientnets import EfficientNetB3
-        base_model = EfficientNetB3(
+        from keras_efficientnets import EfficientNetB2
+        base_model = EfficientNetB2(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
@@ -71,8 +71,8 @@ def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
             input_shape=input_shape
         )
     if base_model == 'efficientnetb4':
-        from keras_efficientnets import EfficientNetB3
-        base_model = EfficientNetB3(
+        from keras_efficientnets import EfficientNetB4
+        base_model = EfficientNetB4(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
