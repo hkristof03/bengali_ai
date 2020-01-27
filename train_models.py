@@ -65,7 +65,7 @@ class NeuralNetTrainer(object):
         }
 
         model = build_model(**self._model_config, metrics=metrics_d)
-        train_history = model.fit_generator(
+        train_history = model.fit(
             train_gen,
             steps_per_epoch=step_size_train,
             validation_data=valid_gen,
@@ -111,12 +111,12 @@ class NeuralNetTrainer(object):
             vowel_pred = results[1]
             consonant_pred = results[2]
 
-            root_pred = [np.amax(i) for i in root_pred]
-            vowel_pred = [np.amax(i) for i in vowel_pred]
-            consonant_pred = [np.amax(i) for i in consonant_pred]
-            print(root_pred)
-            print(vowel_pred)
-            print(consonant_pred)
+            root_pred = [np.argmax(i) for i in root_pred]
+            vowel_pred = [np.argmax(i) for i in vowel_pred]
+            consonant_pred = [np.argmax(i) for i in consonant_pred]
+            #print(root_pred)
+            #print(vowel_pred)
+            #print(consonant_pred)
 
             d = {
                 'root_pred': root_pred,
@@ -124,7 +124,7 @@ class NeuralNetTrainer(object):
                 'consonant_pred': consonant_pred
             }
             df_pred = pd.DataFrame.from_dict(d)
-            df_pred = pd.concat([holdout_datagen._holdout_df, df_pred], axis=1)
+            df_pred = pd.concat([self._datagen._holdout_df, df_pred], axis=1)
             print(df_pred)
 
 
