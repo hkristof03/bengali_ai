@@ -101,7 +101,8 @@ class NeuralNetTrainer(object):
             scores = [
                 d['root_recall'], d['vowel_recall'], d['consonant_recall']
             ]
-            d['hier_macro_avg_recall'] = np.average(scores, weights=[2,1,1])
+            hma_recall = float(np.average(scores, weights=[2,1,1]))
+            d['hier_macro_avg_recall'] = hma_recall
             self._config_all['results'] = d
             path_results = (self.base_path
                 + self._test_config['path_save_config']

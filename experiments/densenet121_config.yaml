@@ -90,8 +90,10 @@ callbacks:
 train:
   epochs: 100
 
-test_code: False0
+test_code: False
 
 test:
   tta: False
   tta_steps: 5
+  path_save_config: '/datasets/predictions_config/'
+  path_predictions: '/datasets/predictions/'
