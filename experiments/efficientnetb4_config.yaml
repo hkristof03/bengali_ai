@@ -91,7 +91,7 @@ callbacks:
 train:
   epochs: 100
 
-test_code: True
+test_code: False
 
 test:
   tta: False
