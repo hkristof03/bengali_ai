@@ -107,7 +107,7 @@ class NeuralNetTrainer(object):
             results = model.predict(
                 holdout_datagen, steps=step_size_holdout
             )
-            root_pred = results[0]]
+            root_pred = results[0]
             vowel_pred = results[1]
             consonant_pred = results[2]
 
