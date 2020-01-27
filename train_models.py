@@ -92,7 +92,6 @@ class NeuralNetTrainer(object):
                 predictions.append(preds)
             # To be continued...
         else:
-            """
             metrics_names = model.metrics_names
             results = model.evaluate(
                 holdout_datagen, steps=step_size_holdout
@@ -100,11 +99,11 @@ class NeuralNetTrainer(object):
             results = [float(i) for i in results]
             d = dict(zip(metrics_names, results))
             self._config_all['results'] = d
-            path_results = (self.base_path + '/datasets/predictions/' +
-                self._callbacks_config['experiment_name'] + '.yaml')
+            path_results = (self.base_path
+                + self._test_config['path_save_config']
+                + self._callbacks_config['experiment_name'] + '.yaml')
             dump_dict_yaml(self._config_all, path_results)
-            """
-            print(self._datagen._holdout_df.head(20))
+
             # Get arrays of predictions for later analysis
             results = model.predict(
                 holdout_datagen, steps=step_size_holdout
@@ -132,8 +131,11 @@ class NeuralNetTrainer(object):
             cols = ['grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
             for col in cols:
                 df_pred[col] = df_pred[col].apply(lambda x: np.argmax(x))
-            #df_pred = pd.concat([self._datagen._holdout_df, df_pred], axis=1)
-            print(df_pred)
+
+            path_predictions = (self.base_path
+                + self._test_config['path_predictions']
+                + self._callbacks_config['experiment_name'] + '.csv')
+            df_pred.to_csv(path_predictions, index=False)
 
 
     def predict_test(self):
