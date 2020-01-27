@@ -58,9 +58,9 @@ class NeuralNetTrainer(object):
         self.get_callbacks()
 
         metrics_d = {
-            'root': Recall(name='root_recall'),
-            'vowel': Recall(name='vowel_recall'),
-            'consonant': Recall(name='consonant_recall')
+            'root': Recall(name='recall'),
+            'vowel': Recall(name='recall'),
+            'consonant': Recall(name='recall')
         }
 
         model = build_model(**self._model_config, metrics=metrics_d)
