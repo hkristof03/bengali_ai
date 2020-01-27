@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import pandas as pd
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
@@ -106,9 +107,22 @@ class NeuralNetTrainer(object):
             results = model.predict(
                 holdout_datagen, steps=step_size_holdout
             )
-            print(results)
-            print(results.shape)
-            d = dict(zip(metrics_names, results))
+            root_pred = results[0]]
+            vowel_pred = results[1]
+            consonant_pred = results[2]
+
+            root_pred = [np.amax(i) for i in root_pred]
+            vowel_pred = [np.amax(i) for i in vowel_pred]
+            consonant_pred = [np.amax(i) for i in consonant_pred]
+            print(root_pred)
+            print(vowel_pred)
+            print(consonant_pred)
+
+            d = {
+                'root_pred': root_pred,
+                'vowel_pred': vowel_pred,
+                'consonant_pred': consonant_pred
+            }
             df_pred = pd.DataFrame.from_dict(d)
             df_pred = pd.concat([holdout_datagen._holdout_df, df_pred], axis=1)
             print(df_pred)
