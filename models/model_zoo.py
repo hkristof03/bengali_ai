@@ -42,21 +42,21 @@ def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
             input_shape=input_shape
         )
     if base_model == 'efficientnetb0':
-        from keras_efficientnets import EfficientNetB0
+        from efficientnet.tfkeras import EfficientNetB0
         base_model = EfficientNetB0(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
         )
     if base_model == 'efficientnetb1':
-        from keras_efficientnets import EfficientNetB1
+        from efficientnet.tfkeras import EfficientNetB1
         base_model = EfficientNetB1(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
         )
     if base_model == 'efficientnetb2':
-        from keras_efficientnets import EfficientNetB2
+        from efficientnet.tfkeras import EfficientNetB2
         base_model = EfficientNetB2(
             include_top=False,
             weights='imagenet',
@@ -64,14 +64,14 @@ def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
         )
 
     if base_model == 'efficientnetb3':
-        from keras_efficientnets import EfficientNetB3
+        from efficientnet.tfkeras import EfficientNetB3
         base_model = EfficientNetB3(
             include_top=False,
             weights='imagenet',
             input_shape=input_shape
         )
     if base_model == 'efficientnetb4':
-        from keras_efficientnets import EfficientNetB4
+        from efficientnet.tfkeras import EfficientNetB4
         base_model = EfficientNetB4(
             include_top=False,
             weights='imagenet',
