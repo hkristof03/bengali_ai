@@ -28,7 +28,7 @@ def parse_yaml(path_yaml):
 def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
 
     if base_model == 'resnet50':
-        from tensorflow.keras.applications import  ResNet50
+        from tensorflow.keras.applications import ResNet50
         base_model = ResNet50(
             include_top=False,
             weights='imagenet',

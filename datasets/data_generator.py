@@ -40,6 +40,7 @@ class DataGenerator(object):
         self._holdout = kwargs.get('holdout')
         self._holdout_size = kwargs.get('holdout_size')
         self._seed = kwargs.get('seed')
+        self._cutmix = kwargs.get('cutmix')
         self._datagen_config = kwargs.get('datagen_config')
         self._trvd_config = kwargs.get('train_valid_generator')
         self._trvd_config['directory'] = (self.base_path
@@ -120,13 +121,34 @@ class DataGenerator(object):
         datagen = ImageDataGenerator(
             **self._datagen_config, rescale=1.0/255.0,
         )
-        train_generator = datagen.flow_from_dataframe(
-            self._train_df, **self._trvd_config
-        )
-        valid_generator = datagen.flow_from_dataframe(
-            self._valid_df, **self._trvd_config
-        )
-        return train_generator, valid_generator
+        if self._cutmix:
+            from cutmix_keras import CutMixImageDataGenerator
+
+            train_generator1 = datagen.flow_from_dataframe(
+                self._train_df, **self._trvd_config
+            )
+            train_generator2 = datagen.flow_from_dataframe(
+                self._train_df, **self._trvd_config
+            )
+            valid_generator = datagen.flow_from_dataframe(
+                self._valid_df, **self._trvd_config
+            )
+            train_generator = CutMixImageDataGenerator(
+                generator1=train_generator1,
+                generator2=train_generator2,
+                img_size=self._trvd_config['target_size'][0],
+                batch_size=self._trvd_config['batch_size']
+            )
+            return train_generator, valid_generator
+
+        else:
+            train_generator = datagen.flow_from_dataframe(
+                self._train_df, **self._trvd_config
+            )
+            valid_generator = datagen.flow_from_dataframe(
+                self._valid_df, **self._trvd_config
+            )
+            return train_generator, valid_generator
 
     def get_datagenerator_holdout(self):
         """

@@ -24,6 +24,7 @@ class NeuralNetTrainer(object):
         self._train_config = kwargs.get('train')
         self._test_config = kwargs.get('test')
         self._test_code = kwargs.get('test_code')
+        self._cutmix = kwargs.get('cutmix')
         self._datagen = None
         self._callbacks = None
 
