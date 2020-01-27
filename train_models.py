@@ -58,12 +58,9 @@ class NeuralNetTrainer(object):
         self.get_callbacks()
 
         metrics_d = {
-            'metrics':
-                {
-                    'root': Recall(name='root_recall'),
-                    'vowel': Recall(name='vowel_recall'),
-                    'consonant': Recall(name='consonant_recall')
-                }
+            'root': Recall(name='root_recall'),
+            'vowel': Recall(name='vowel_recall'),
+            'consonant': Recall(name='consonant_recall')
         }
 
         model = build_model(**self._model_config, metrics=metrics_d)
@@ -110,7 +107,7 @@ class NeuralNetTrainer(object):
                 holdout_datagen, steps=step_size_holdout
             )
             d = dict(zip(metrics_names, results))
-            df_pred = pd.DataFrame(d)
+            df_pred = pd.DataFrame.from_dict(d)
             df_pred = pd.concat([holdout_datagen._holdout_df, df_pred], axis=1)
             print(df_pred)
 
