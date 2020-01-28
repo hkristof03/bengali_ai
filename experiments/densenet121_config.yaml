@@ -83,7 +83,8 @@ callbacks:
   modelcp:
     filepath: '/datasets/saved_models/'
     save_best_only: True
-    mode: 'auto'
+    monitor: 'val_root_recall'
+    mode: 'max'
   csvlog:
     filename: '/artifacts/densenet121/'
   experiment_name: 'densenet121_recall'         # Modify this for new log files!

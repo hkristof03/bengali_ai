@@ -49,7 +49,7 @@ preprocess:
     class_mode: None
     batch_size: 1
   #    seed: 7              # Can be used in Test-Time Augmentation?
-  cutmix: True    # Use cutmix augmentation
+  cutmix: False    # Use cutmix augmentation
 
 model:
   base_model: 'resnet50'
@@ -83,7 +83,8 @@ callbacks:
   modelcp:
     filepath: '/datasets/saved_models/'
     save_best_only: True
-    mode: 'auto'
+    monitor: 'val_root_recall'
+    mode: 'max'
   csvlog:
     filename: '/artifacts/resnet50/'
   experiment_name: 'resnet50_recall'         # Modify this for new log files!

@@ -83,7 +83,8 @@ callbacks:
   modelcp:
     filepath: '/datasets/saved_models/'
     save_best_only: True
-    mode: 'auto'
+    monitor: 'val_root_recall'
+    mode: 'max'
   csvlog:
     filename: '/artifacts/efficientnet/'
   experiment_name: 'efficientnetb2_recall'         # Modify this for new log files!
