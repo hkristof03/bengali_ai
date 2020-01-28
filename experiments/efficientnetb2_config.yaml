@@ -28,7 +28,7 @@ preprocess:
     class_mode: 'multi_output'
     batch_size: 64
     color_mode: 'rgb'
-    target_size: !!python/tuple [200, 200]
+    target_size: !!python/tuple [160, 160]
     shuffle: True
   holdout_generator:
     directory: '/datasets/train_images_cropped/'
@@ -40,7 +40,7 @@ preprocess:
     class_mode: 'multi_output'
     batch_size: 64
     color_mode: 'rgb'
-    target_size: !!python/tuple [200, 200]
+    target_size: !!python/tuple [160, 160]
     shuffle: False
   test_generator:
     directory: '/data/test_images/'
@@ -53,7 +53,7 @@ preprocess:
 
 model:
   base_model: 'efficientnetb2'
-  input_shape: !!python/tuple [200, 200, 3]
+  input_shape: !!python/tuple [160, 160, 3]
 #  metrics:
 #    root: 'accuracy'
 #    vowel: 'accuracy'
@@ -77,9 +77,9 @@ callbacks:
   earlystop:
     monitor: 'val_root_recall'
     patience: 10
-    min_delta: 0
+    min_delta: 0.0
     verbose: 1
-    mode: 'auto'
+    mode: 'max'
   modelcp:
     filepath: '/datasets/saved_models/'
     save_best_only: True
