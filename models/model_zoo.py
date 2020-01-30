@@ -77,6 +77,13 @@ def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
             weights='imagenet',
             input_shape=input_shape
         )
+    if base_model == 'efficientnetb5':
+        from efficientnet.tfkeras import EfficientNetB5
+        base_model = EfficientNetB5(
+            include_top=False,
+            weights='imagenet',
+            input_shape=input_shape
+        )
 
     x_in = Input(shape=input_shape)
     x = Conv2D(3, (3, 3), padding='same')(x_in)
