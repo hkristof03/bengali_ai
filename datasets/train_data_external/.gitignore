@@ -1,0 +1,6 @@
+# Data can be downloaded from here:
+# https://github.com/MinhasKamal/BengaliDictionary
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
