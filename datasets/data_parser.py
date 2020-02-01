@@ -109,9 +109,28 @@ def process_parquet_files(train=True, nprocess=10, crop=False):
             df_parquet = pd.read_parquet(file)
             save_images(df_parquet, ps)
 
+def create_external_dataframe():
+    """
+    """
+    path_ext_df = (base_path + '/datasets/train_data/external_images.csv')
+    path_ext_imgs = (base_path +
+        '/datasets/external_images/external_images/*.jpg')
+
+    if not os.path.isfile(path_ext_df):
+        files = glob.glob(path_ext_imgs)
+        d = {'image_id': files}
+        df = pd.DataFrame(d)
+        df['image_id'] = df['image_id'].apply(
+            lambda x: 'ex_' + x.split('/')[-1]
+        )
+        df.to_csv(path_ext_df, index=False)
+    else:
+        print("DataFrame with external images already exists!")
+
 
 
 
 if __name__ == '__main__':
     args = parse_args()
-    process_parquet_files(args.train, args.nprocess, crop=args.crop)
+    #process_parquet_files(args.train, args.nprocess, crop=args.crop)
+    create_external_dataframe()
