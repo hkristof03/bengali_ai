@@ -50,4 +50,4 @@ test_generator:
   class_mode: None
   batch_size: 1
 #    seed: 7              # Can be used in Test-Time Augmentation?
-cutmix: False    # Use cutmix augmentation
+cutmix: True    # Use cutmix augmentation
