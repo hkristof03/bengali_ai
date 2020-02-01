@@ -4,7 +4,7 @@ preprocess:
   path_test_df: '/datasets/train_data/test.csv'
   dummies: True
   multilabelstratifiedkfold: True
-  nfolds: 5
+  nfolds: 10
   holdout: True
   holdout_size: 0.2
   seed: 2020
@@ -28,9 +28,9 @@ preprocess:
       - vowel_diacritic
       - consonant_diacritic
     class_mode: 'multi_output'
-    batch_size: 64
+    batch_size: 128
     color_mode: 'rgb'
-    target_size: !!python/tuple [160, 160]
+    target_size: !!python/tuple [128, 128]
     shuffle: True
   holdout_generator:
     directory: '/datasets/train_images_cropped/'
@@ -40,22 +40,22 @@ preprocess:
       - vowel_diacritic
       - consonant_diacritic
     class_mode: 'multi_output'
-    batch_size: 64
+    batch_size: 128
     color_mode: 'rgb'
-    target_size: !!python/tuple [160, 160]
+    target_size: !!python/tuple [128, 128]
     shuffle: False
   test_generator:
     directory: '/data/test_images/'
-    target_size: !!python/tuple [137, 236]
+    target_size: !!python/tuple [128, 128]
     shuffle: False
     class_mode: None
     batch_size: 1
   #    seed: 7              # Can be used in Test-Time Augmentation?
-  cutmix: False
+  cutmix: True
 
 model:
   base_model: 'densenet121'
-  input_shape: !!python/tuple [160, 160, 3]
+  input_shape: !!python/tuple [128, 128, 3]
 #  metrics:
 #    root: recall
 #    vowel: recall
@@ -89,12 +89,12 @@ callbacks:
     mode: 'max'
   csvlog:
     filename: '/artifacts/densenet121/'
-  experiment_name: 'densenet121_recall'         # Modify this for new log files!
+  experiment_name: 'densenet121_128_mlstrat_cutmix'         # Modify this for new log files!
 
 train:
-  epochs: 100
+  epochs: 200
 
-test_code: False
+test_code: True
 
 test:
   tta: False

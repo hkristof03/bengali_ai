@@ -2,7 +2,6 @@ import os
 
 import numpy as np
 import pandas as pd
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
 from tensorflow.keras.metrics import Recall, Precision
