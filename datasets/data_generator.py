@@ -33,22 +33,28 @@ class DataGenerator(object):
     """
     base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    def __init__(self, **kwargs):
-        self._path_train_df = self.base_path + kwargs.get('path_train_df')
-        self._path_test_df = self.base_path + kwargs.get('path_test_df')
-        self._dummies = kwargs.get('dummies')
-        self._holdout = kwargs.get('holdout')
-        self._holdout_size = kwargs.get('holdout_size')
-        self._seed = kwargs.get('seed')
-        self._cutmix = kwargs.get('cutmix')
-        self._datagen_config = kwargs.get('datagen_config')
-        self._trvd_config = kwargs.get('train_valid_generator')
+    def __init__(
+        self, path_train_df, path_test_df, dummies, multilabelstratifiedkfold,
+        nfolds, holdout, holdout_size, seed, cutmix, datagen_config,
+        train_valid_generator, holdout_generator, test_generator, **kwargs
+        ):
+        self._path_train_df = self.base_path + path_train_df
+        self._path_test_df = self.base_path + path_test_df
+        self._dummies = dummies
+        self._multilabelstratifiedkfold = multilabelstratifiedkfold
+        self._nfolds = nfolds
+        self._holdout = holdout
+        self._holdout_size = holdout_size
+        self._seed = seed
+        self._cutmix = cutmix
+        self._datagen_config = datagen_config
+        self._trvd_config = train_valid_generator
         self._trvd_config['directory'] = (self.base_path
             + self._trvd_config['directory'])
-        self._holdout_config = kwargs.get('holdout_generator')
+        self._holdout_config = holdout_generator
         self._holdout_config['directory'] = (self.base_path
             + self._holdout_config['directory'])
-        self._test_config = kwargs.get('test_generator')
+        self._test_config = test_generator
         self._test_config['directory'] = (self.base_path
             + self._test_config['directory'])
         self._df = None
@@ -60,6 +66,26 @@ class DataGenerator(object):
         """
         """
         self._df = pd.read_csv(self._path_train_df)
+
+        if self._multilabelstratifiedkfold:
+            from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
+            self._df['id'] = self._df['image_id'].apply(
+                lambda x: int(x.split('_')[1])
+            )
+            cols = ['id', 'grapheme_root', 'vowel_diacritic',
+                'consonant_diacritic']
+            X, y = self._df[cols].values[:, 0], self._df.values[:, 1:]
+            self._df['fold'] = np.nan
+
+            mskf = MultilabelStratifiedKFold(
+                n_splits=self._nfolds, shuffle=True, random_state=self._seed
+            )
+            for i, (_, test_index) in enumerate(mskf.split(X, y)):
+                self._df.iloc[test_index, -1] = i
+
+            self._df['fold'] = self._df['fold'].astype('int')
+            del self._df['id']
+
         self._df['image_id'] = self._df['image_id'].apply(
             lambda x: x + '.jpg'
         )
@@ -109,11 +135,30 @@ class DataGenerator(object):
         """
         """
         self.parse_train_dataframe()
-        if self._holdout:
+        if (self._holdout and not self._multilabelstratifiedkfold):
             self._holdout_df = self._df.sample(
                 frac=self._holdout_size, random_state=self._seed
             )
-            self._df = self._df[~self._df.index.isin(self._holdout_df.index)]
+            self._df = self._df.loc[
+                (~self._df.index.isin(self._holdout_df.index))
+            ]
+
+        if (self._holdout and self._multilabelstratifiedkfold):
+            import random
+            assert (self._holdout_size >= 1 / self._nfolds)
+
+            if (self._holdout_size == 1 / self._nfolds):
+                n_holdout_folds = 1
+            if (self._holdout_size > 1/ self._nfolds):
+                n_holdout_folds = self._holdout_size / round(1/self._nfolds, 1)
+
+            random.seed(self._seed)
+            folds = random.sample(range(self._nfolds), n_holdout_folds)
+            condition = self._df['fold'].isin(folds)
+            self._holdout_df = self._df.loc[condition]
+            self._df = self._df.loc[
+                (~self._df.index.isin(self._holdout_df.index))
+            ]
 
         self._train_df, self._valid_df = train_test_split(
             self._df, test_size=0.15

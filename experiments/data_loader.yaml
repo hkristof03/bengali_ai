@@ -2,6 +2,8 @@
 path_train_df: '/datasets/train_data/train.csv'
 path_test_df: '/datasets/train_data/test.csv'
 dummies: True
+multilabelstratifiedkfold: True
+nfolds: 5
 holdout: True
 holdout_size: 0.2
 seed: 2020
@@ -11,10 +13,10 @@ datagen_config:
   featurewise_std_normalization: False    # divide inputs by std of the dataset
   samplewise_std_normalization: False    # divide each input by its std
   zca_whitening: False    # apply ZCA whitening
-  rotation_range: 8    # randomly rotate images in the range (degrees, 0 to 180)
-  zoom_range: 0.15    # Randomly zoom image
-  width_shift_range: 0.15    # randomly shift images horizontally (fraction of total width)
-  height_shift_range: 0.15    # randomly shift images vertically (fraction of total height)
+  rotation_range: 0.0    # randomly rotate images in the range (degrees, 0 to 180)
+  zoom_range: 0.0    # Randomly zoom image
+  width_shift_range: 0.0    # randomly shift images horizontally (fraction of total width)
+  height_shift_range: 0.0    # randomly shift images vertically (fraction of total height)
   horizontal_flip: False    # randomly flip images
   vertical_flip: False    # randomly flip images
 train_valid_generator:
@@ -27,7 +29,8 @@ train_valid_generator:
   class_mode: 'multi_output'
   batch_size: 64
   color_mode: 'rgb'
-  target_size: !!python/tuple [128, 128]
+  target_size: !!python/tuple [160, 160]
+  shuffle: True
 holdout_generator:
   directory: '/datasets/train_images_cropped/'
   x_col: 'image_id'
@@ -38,7 +41,8 @@ holdout_generator:
   class_mode: 'multi_output'
   batch_size: 64
   color_mode: 'rgb'
-  target_size: !!python/tuple [128, 128]
+  target_size: !!python/tuple [160, 160]
+  shuffle: False
 test_generator:
   directory: '/data/test_images/'
   target_size: !!python/tuple [137, 236]
@@ -46,3 +50,4 @@ test_generator:
   class_mode: None
   batch_size: 1
 #    seed: 7              # Can be used in Test-Time Augmentation?
+cutmix: False    # Use cutmix augmentation
