@@ -13,11 +13,11 @@ preprocess:
     samplewise_center: False    # set each sample mean to 0
     featurewise_std_normalization: False    # divide inputs by std of the dataset
     samplewise_std_normalization: False    # divide each input by its std
-    zca_whitening: False    # apply ZCA whitening
-    rotation_range: 0    # randomly rotate images in the range (degrees, 0 to 180)
-    zoom_range: 0.0    # Randomly zoom image
-    width_shift_range: 0.0    # randomly shift images horizontally (fraction of total width)
-    height_shift_range: 0.0    # randomly shift images vertically (fraction of total height)
+    zca_whitening: True    # apply ZCA whitening
+    rotation_range: 50.0    # randomly rotate images in the range (degrees, 0 to 180)
+    zoom_range: 0.15    # Randomly zoom image
+    width_shift_range: 0.1    # randomly shift images horizontally (fraction of total width)
+    height_shift_range: 0.1    # randomly shift images vertically (fraction of total height)
     horizontal_flip: False    # randomly flip images
     vertical_flip: False    # randomly flip images
   train_valid_generator:
@@ -28,9 +28,9 @@ preprocess:
       - vowel_diacritic
       - consonant_diacritic
     class_mode: 'multi_output'
-    batch_size: 64
+    batch_size: 128
     color_mode: 'rgb'
-    target_size: !!python/tuple [160, 160]
+    target_size: !!python/tuple [128, 128]
     shuffle: True
   holdout_generator:
     directory: '/datasets/train_images_cropped/'
@@ -40,13 +40,13 @@ preprocess:
       - vowel_diacritic
       - consonant_diacritic
     class_mode: 'multi_output'
-    batch_size: 64
+    batch_size: 128
     color_mode: 'rgb'
-    target_size: !!python/tuple [160, 160]
+    target_size: !!python/tuple [128, 128]
     shuffle: False
   test_generator:
     directory: '/data/test_images/'
-    target_size: !!python/tuple [137, 236]
+    target_size: !!python/tuple [128, 128]
     shuffle: False
     class_mode: None
     batch_size: 1
@@ -55,7 +55,7 @@ preprocess:
 
 model:
   base_model: 'efficientnetb3'
-  input_shape: !!python/tuple [160, 160, 3]
+  input_shape: !!python/tuple [128, 128, 3]
 #  metrics:
 #    root: 'accuracy'
 #    vowel: 'accuracy'
@@ -89,10 +89,10 @@ callbacks:
     mode: 'max'
   csvlog:
     filename: '/artifacts/efficientnet/'
-  experiment_name: 'efficientnetb3_recall'         # Modify this for new log files!
+  experiment_name: 'efficientnetb3_128_aug'         # Modify this for new log files!
 
 train:
-  epochs: 100
+  epochs: 200
 
 test_code: False
 

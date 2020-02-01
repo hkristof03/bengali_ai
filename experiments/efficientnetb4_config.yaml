@@ -13,11 +13,11 @@ preprocess:
     samplewise_center: False    # set each sample mean to 0
     featurewise_std_normalization: False    # divide inputs by std of the dataset
     samplewise_std_normalization: False    # divide each input by its std
-    zca_whitening: False    # apply ZCA whitening
-    rotation_range: 0    # randomly rotate images in the range (degrees, 0 to 180)
-    zoom_range: 0.0    # Randomly zoom image
-    width_shift_range: 0.0    # randomly shift images horizontally (fraction of total width)
-    height_shift_range: 0.0    # randomly shift images vertically (fraction of total height)
+    zca_whitening: True    # apply ZCA whitening
+    rotation_range: 50.0    # randomly rotate images in the range (degrees, 0 to 180)
+    zoom_range: 0.15    # Randomly zoom image
+    width_shift_range: 0.1    # randomly shift images horizontally (fraction of total width)
+    height_shift_range: 0.1    # randomly shift images vertically (fraction of total height)
     horizontal_flip: False    # randomly flip images
     vertical_flip: False    # randomly flip images
   train_valid_generator:
@@ -89,12 +89,12 @@ callbacks:
     mode: 'max'
   csvlog:
     filename: '/artifacts/efficientnet/'
-  experiment_name: 'efficientnetb4_128_mlstrat_cutmix'         # Modify this for new log files!
+  experiment_name: 'efficientnetb4_128_aug'         # Modify this for new log files!
 
 train:
   epochs: 200
 
-test_code: True
+test_code: False
 
 test:
   tta: False

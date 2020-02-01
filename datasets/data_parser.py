@@ -127,9 +127,6 @@ def create_external_dataframe():
     else:
         print("DataFrame with external images already exists!")
 
-
-
-
 if __name__ == '__main__':
     args = parse_args()
     #process_parquet_files(args.train, args.nprocess, crop=args.crop)
