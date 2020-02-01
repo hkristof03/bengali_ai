@@ -33,6 +33,7 @@ class CutMixImageDataGenerator():
         self.batch_index = 0
         self.samples = generator1.samples
         #self.class_indices = generator1.class_indices
+        self.n = generator1.samples
         self.generator1 = generator1
         self.generator2 = generator2
         self.img_size = img_size
