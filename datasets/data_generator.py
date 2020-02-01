@@ -149,8 +149,8 @@ class DataGenerator(object):
 
             if (self._holdout_size == 1 / self._nfolds):
                 n_holdout_folds = 1
-            if (self._holdout_size > 1/ self._nfolds):
-                n_holdout_folds = self._holdout_size / round(1/self._nfolds, 1)
+            if (self._holdout_size > 1 / self._nfolds):
+                n_holdout_folds = int(self._holdout_size / round(1/self._nfolds, 1))
 
             random.seed(self._seed)
             folds = random.sample(range(self._nfolds), n_holdout_folds)
