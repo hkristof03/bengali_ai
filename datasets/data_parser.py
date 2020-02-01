@@ -114,7 +114,7 @@ def create_external_dataframe():
     """
     path_ext_df = (base_path + '/datasets/train_data/external_images.csv')
     path_ext_imgs = (base_path +
-        '/datasets/external_images/external_images/*.jpg')
+        '/datasets/train_data_external/external_images/external_images/*.jpg')
 
     if not os.path.isfile(path_ext_df):
         files = glob.glob(path_ext_imgs)
