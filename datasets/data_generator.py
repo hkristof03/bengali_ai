@@ -295,7 +295,7 @@ class DataGenerator(object):
     def get_datagenerator_noisy_student(self, pseudo_df=pd.DataFrame()):
         """
         """
-        if (self._noisy_student['noisy_student_training'] and iter_df.empty):
+        if (self._noisy_student['noisy_student_training'] and pseudo_df.empty):
             # Teacher never gets noise for predictions!!!
             datagen = ImageDataGenerator(rescale=1.0/255.0)
             nsd = datagen.flow_from_dataframe(
