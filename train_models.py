@@ -24,6 +24,7 @@ class NeuralNetTrainer(object):
         self._test_config = kwargs.get('test')
         self._test_code = kwargs.get('test_code')
         self._cutmix = kwargs.get('cutmix')
+        self._noisy_student = kwargs.get('noisy_student')
         self._datagen = None
         self._callbacks = None
 
@@ -73,7 +74,22 @@ class NeuralNetTrainer(object):
             callbacks=self._callbacks,
             **self._train_config
         )
+
+        if self._noisy_student['noisy_student_training']:
+            iterations = self._noisy_student['student_iterations']
+            for i in range(iterations):
+                pseudo_df = self.predict_noisy_student(model)
+                train_gen, valid_gen = self._datagen.get_datagenerators_train(
+                    pseudo_df
+                )
+
         self.predict_holdout(model)
+
+    def train_noisy_student(self):
+        """
+        """
+        pass
+
 
     def predict_holdout(self, model):
         """
@@ -117,9 +133,9 @@ class NeuralNetTrainer(object):
             vowel_pred = results[1]
             consonant_pred = results[2]
 
-            root_pred = [np.argmax(i) for i in root_pred]
-            vowel_pred = [np.argmax(i) for i in vowel_pred]
-            consonant_pred = [np.argmax(i) for i in consonant_pred]
+            root_pred = np.argmax(i, axis=1)
+            vowel_pred = np.argmax(i, axis=1)
+            consonant_pred = np.argmax(i, axis=1)
 
             d = {
                 'image_id': filenames,
@@ -142,6 +158,60 @@ class NeuralNetTrainer(object):
                 + self._callbacks_config['experiment_name'] + '.csv')
             df_pred.to_csv(path_predictions, index=False)
 
+    def predict_noisy_student(self, model):
+        """
+        """
+        ns_datagen = self._datagen.get_datagenerator_noisy_student()
+        filenames = ns_datagen.filenames
+        step_size_ns = ns_datagen.n / ns_datagen.batch_size
+        metrics_names = model.metrics_names
+        results = model.predict(
+            ns_datagen, steps=step_size_ns
+        )
+        root_pred = results[0]
+        vowel_pred = results[1]
+        consonant_pred = results[2]
+        root_pred = [i for i in root_pred]
+        vowel_pred = [i for i in vowel_pred]
+        consonant_pred = [i for i in consonant_pred]
+        d = {
+            'image_id': filenames,
+            'grapheme_root': root_pred,
+            'vowel_diacritic': vowel_pred,
+            'consonant_diacritic': consonant_pred
+        }
+        pseudo_df = pd.DataFrame.from_dict(d)
+        print(len(f'Original length: {pseudo_df}'))
+        pseudo_df['gr_max'] = pseudo_df['grapheme_root'].apply(
+            lambda x: np.amax(x)
+        )
+        pseudo_df['vd_max'] = pseudo_df['vowel_diacritic'].apply(
+            lambda x: np.amax(x)
+        )
+        pseudo_df['cd_max'] = pseudo_df['consonant_diacritic'].apply(
+            lambda x: np.amax(x)
+        )
+        # Selection criteria here
+        selection_threshold = self._noisy_student['selection_threshold']
+        condition = (pseudo_df['gr_max'] > selection_threshold and
+            pseudo_df['vd_max'] > selection_threshold and
+            pseudo_df['cd_max'] > selection_threshold)
+        pseudo_df = pseudo_df.loc[condition]
+        cols = [
+            'image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic'
+        ]
+        pseudo_df.loc[:, cols] = pseudo_df['grapheme_root'].apply(
+            lambda x: np.argmax(x)
+        )
+        pseudo_df.loc[:, cols] = pseudo_df['vowel_diacritic'].apply(
+            lambda x: np.argmax(x)
+        )
+        pseudo_df.loc[:, cols] = pseudo_df['consonant_diacritic'].apply(
+            lambda x: np.argmax(x)
+        )
+        print(len(f'Selected length: {pseudo_df}'))
+
+        return pseudo_df
 
     def predict_test(self):
         """

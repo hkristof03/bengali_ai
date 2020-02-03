@@ -106,8 +106,9 @@ class DataGenerator(object):
 
     def __init__(
         self, path_train_df, path_test_df, dummies, multilabelstratifiedkfold,
-        nfolds, holdout, holdout_size, seed, cutmix, datagen_config,
-        train_valid_generator, holdout_generator, test_generator, **kwargs
+        nfolds, holdout, holdout_size, seed, augment_predictions, cutmix,
+        datagen_config, train_valid_generator, holdout_generator,
+        test_generator, noisy_student, **kwargs
         ):
         self._path_train_df = self.base_path + path_train_df
         self._path_test_df = self.base_path + path_test_df
@@ -117,7 +118,9 @@ class DataGenerator(object):
         self._holdout = holdout
         self._holdout_size = holdout_size
         self._seed = seed
+        self._augment_predictions = augment_predictions  # Used not to augment holdout set
         self._cutmix = cutmix
+        self._noisy_student = noisy_student
         self._datagen_config = datagen_config
         self._trvd_config = train_valid_generator
         self._trvd_config['directory'] = (self.base_path
@@ -132,6 +135,7 @@ class DataGenerator(object):
         self._train_df = None
         self._valid_df = None
         self._holdout_df = None
+        self._external_df = None
 
     def parse_train_dataframe(self):
         """
@@ -193,6 +197,13 @@ class DataGenerator(object):
             })
         else:
             del self._df['grapheme']
+
+        if self._noisy_student['noisy_student_training']:
+            self._noisy_student['path_external_df'] = (self.base_path +
+                self._noisy_student['path_external_df'])
+            self._external_df = pd.read_csv(
+                self._noisy_student['path_external_df']
+            )
 
     def parse_test_dataframe(self):
         """
@@ -269,21 +280,59 @@ class DataGenerator(object):
         """
         """
         if self._holdout:
-            datagen = ImageDataGenerator(**self._datagen_config, rescale=1.0/255.0)
+            if self._augment_predictions:
+                datagen = ImageDataGenerator(
+                    **self._datagen_config, rescale=1.0/255.0
+                )
+            else:
+                datagen = ImageDataGenerator(rescale=1.0/255.0)
+
             holdout_datagen = datagen.flow_from_dataframe(
                 self._holdout_df, **self._holdout_config
             )
             return holdout_datagen
 
+    def get_datagenerator_noisy_student(self, pseudo_df=pd.DataFrame()):
+        """
+        """
+        if (self._noisy_student['noisy_student_training'] and iter_df.empty):
+            # Teacher never gets noise for predictions!!!
+            datagen = ImageDataGenerator(rescale=1.0/255.0)
+            nsd = datagen.flow_from_dataframe(
+                self._external_df,
+                **self._noisy_student['noisy_student_generator']
+            )
+            return nsd
+
+        if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
+            pseudo_df = pd.concat([self._df, pseudo_df], axis=0)
+            self._train_df, self._valid_df = train_test_split(
+                pseudo_df, test_size=0.15
+            )
+            datagen = ImageDataGenerator(
+                **self._datagen_config, rescale=1.0/255.0
+            )
+            nsd_tr = datagen.flow_from_dataframe(
+                self._train_df, **self._trvd_config
+            )
+            nsd_val = datagen.flow_from_dataframe(
+                self._valid_df, **self._trvd_config
+            )
+            return nsd_tr, nsd_val
+
+
     def get_datagenerator_test(self):
         """
         """
         self.parse_test_dataframe()
-        datagen = ImageDataGenerator(
-            **self._datagen_config, rescale=1.0/255.0
+        if self._augment_predictions:
+            datagen = ImageDataGenerator(
+                **self._datagen_config, rescale=1.0/255.0
         )
-        test_generator = datagen.flow_from_directory(**self._test_config)
+        else:
+            datagen = ImageDataGenerator(rescale=1.0/255.0)
 
+        test_generator = datagen.flow_from_directory(**self._test_config
         return test_generator
 
 
