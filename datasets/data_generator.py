@@ -320,7 +320,6 @@ class DataGenerator(object):
             )
             return nsd_tr, nsd_val
 
-
     def get_datagenerator_test(self):
         """
         """
@@ -332,7 +331,7 @@ class DataGenerator(object):
         else:
             datagen = ImageDataGenerator(rescale=1.0/255.0)
 
-        test_generator = datagen.flow_from_directory(**self._test_config
+        test_generator = datagen.flow_from_directory(**self._test_config)
         return test_generator
 
 
