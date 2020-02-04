@@ -77,8 +77,9 @@ class NeuralNetTrainer(object):
 
         if self._noisy_student['noisy_student_training']:
             iterations = self._noisy_student['student_iterations']
+            nsd = self._datagen.get_datagenerator_noisy_student()
+            pseudo_df = self.predict_noisy_student(model, nsd)
             for i in range(iterations):
-                pseudo_df = self.predict_noisy_student(model)
                 train_gen, valid_gen = self._datagen.get_datagenerators_train(
                     pseudo_df
                 )
@@ -127,7 +128,7 @@ class NeuralNetTrainer(object):
 
             # Get arrays of predictions for later analysis
             results = model.predict(
-                holdout_datagen, steps=step_size_holdout
+                holdout_datagen, steps=step_size_holdout, verbose=1
             )
             root_pred = results[0]
             vowel_pred = results[1]
@@ -158,15 +159,14 @@ class NeuralNetTrainer(object):
                 + self._callbacks_config['experiment_name'] + '.csv')
             df_pred.to_csv(path_predictions, index=False)
 
-    def predict_noisy_student(self, model):
+    def predict_noisy_student(self, model, ns_datagen):
         """
         """
-        ns_datagen = self._datagen.get_datagenerator_noisy_student()
         filenames = ns_datagen.filenames
         step_size_ns = ns_datagen.n / ns_datagen.batch_size
         metrics_names = model.metrics_names
         results = model.predict(
-            ns_datagen, steps=step_size_ns
+            ns_datagen, steps=step_size_ns, verbose=1
         )
         root_pred = results[0]
         vowel_pred = results[1]
@@ -193,9 +193,11 @@ class NeuralNetTrainer(object):
         )
         # Selection criteria here
         selection_threshold = self._noisy_student['selection_threshold']
-        condition = (pseudo_df['gr_max'] > selection_threshold and
-            pseudo_df['vd_max'] > selection_threshold and
-            pseudo_df['cd_max'] > selection_threshold)
+        condition = (
+            (pseudo_df['gr_max'] > selection_threshold) &
+            (pseudo_df['vd_max'] > selection_threshold) &
+            (pseudo_df['cd_max'] > selection_threshold)
+        )
         pseudo_df = pseudo_df.loc[condition]
         cols = [
             'image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic'
