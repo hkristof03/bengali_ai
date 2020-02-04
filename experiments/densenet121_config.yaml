@@ -101,7 +101,7 @@ callbacks:
     mode: 'max'
   csvlog:
     filename: '/artifacts/densenet121/'
-  experiment_name: 'densenet121_128_aug'         # Modify this for new log files!
+  experiment_name: 'densenet121_noisy_student_test'         # Modify this for new log files!
 
 train:
   epochs: 200

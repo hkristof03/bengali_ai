@@ -83,6 +83,17 @@ class NeuralNetTrainer(object):
                 train_gen, valid_gen = self._datagen.get_datagenerators_train(
                     pseudo_df
                 )
+                # Deeper model should come here according to the research
+                model = build_model(**self._model_config, metrics=metrics_d)
+                train_history = model.fit(
+                    train_gen,
+                    steps_per_epoch=step_size_train,
+                    validation_data=valid_gen,
+                    validation_steps=step_size_valid,
+                    callbacks=self._callbacks,
+                    **self._train_config
+                )
+                # ....
 
         self.predict_holdout(model)
 
@@ -181,7 +192,7 @@ class NeuralNetTrainer(object):
             'consonant_diacritic': consonant_pred
         }
         pseudo_df = pd.DataFrame.from_dict(d)
-        print(len(f'Original length: {pseudo_df}'))
+        print(f'Original length: {len(pseudo_df)}')
         pseudo_df['gr_max'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.amax(x)
         )
@@ -199,19 +210,16 @@ class NeuralNetTrainer(object):
             (pseudo_df['cd_max'] > selection_threshold)
         )
         pseudo_df = pseudo_df.loc[condition]
-        cols = [
-            'image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic'
-        ]
-        pseudo_df.loc[:, cols] = pseudo_df['grapheme_root'].apply(
+        pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.argmax(x)
         )
-        pseudo_df.loc[:, cols] = pseudo_df['vowel_diacritic'].apply(
+        pseudo_df.loc[:, 'vowel_diacritic'] = pseudo_df['vowel_diacritic'].apply(
             lambda x: np.argmax(x)
         )
-        pseudo_df.loc[:, cols] = pseudo_df['consonant_diacritic'].apply(
+        pseudo_df.loc[:, 'consonant_diacritic'] = pseudo_df['consonant_diacritic'].apply(
             lambda x: np.argmax(x)
         )
-        print(len(f'Selected length: {pseudo_df}'))
+        print(f'Selected length: {len(pseudo_df)}')
 
         return pseudo_df
 
