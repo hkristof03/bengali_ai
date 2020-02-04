@@ -77,12 +77,14 @@ class NeuralNetTrainer(object):
 
         if self._noisy_student['noisy_student_training']:
             iterations = self._noisy_student['student_iterations']
-            nsd = self._datagen.get_datagenerator_noisy_student()
-            pseudo_df = self.predict_noisy_student(model, nsd)
+            ns_datagen = self._datagen.get_datagenerator_noisy_student()
+            pseudo_df = self.predict_noisy_student(model, ns_datagen)
             for i in range(iterations):
-                train_gen, valid_gen = self._datagen.get_datagenerators_train(
+                ns_tr_gen, ns_val_gen = self._datagen.get_datagenerator_noisy_student(
                     pseudo_df
                 )
+                step_size_train = ns_tr_gen.n / ns_tr_gen.batch_size
+                step_size_valid = ns_val_gen.n / ns_val_gen.batch_size
                 # Deeper model should come here according to the research
                 model = build_model(**self._model_config, metrics=metrics_d)
                 train_history = model.fit(
@@ -206,8 +208,8 @@ class NeuralNetTrainer(object):
         selection_threshold = self._noisy_student['selection_threshold']
         condition = (
             (pseudo_df['gr_max'] > selection_threshold) &
-            (pseudo_df['vd_max'] > selection_threshold) &
-            (pseudo_df['cd_max'] > selection_threshold)
+            #(pseudo_df['vd_max'] > selection_threshold) &
+            #(pseudo_df['cd_max'] > selection_threshold)
         )
         pseudo_df = pseudo_df.loc[condition]
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
