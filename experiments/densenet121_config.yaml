@@ -49,7 +49,7 @@ preprocess:
     directory: '/data/test_images/'
     target_size: !!python/tuple [128, 128]
     shuffle: False
-    class_mode: None
+    class_mode: !!python/none
     batch_size: 128
   #    seed: 7              # Can be used in Test-Time Augmentation?
   cutmix: False
@@ -59,8 +59,10 @@ preprocess:
     path_external_df: '/datasets/train_data/external_images.csv'
     noisy_student_generator:
       directory: '/datasets/train_images_cropped/'
+      x_col: 'image_id'
+      y_col: !!python/none
       shuffle: False
-      class_mode: None
+      class_mode: !!python/none
       batch_size: 128
 
 model:
