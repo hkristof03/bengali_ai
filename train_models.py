@@ -88,9 +88,9 @@ class NeuralNetTrainer(object):
                 # Deeper model should come here according to the research
                 model = build_model(**self._model_config, metrics=metrics_d)
                 train_history = model.fit(
-                    train_gen,
+                    ns_tr_gen,
                     steps_per_epoch=step_size_train,
-                    validation_data=valid_gen,
+                    validation_data=ns_val_gen,
                     validation_steps=step_size_valid,
                     callbacks=self._callbacks,
                     **self._train_config
