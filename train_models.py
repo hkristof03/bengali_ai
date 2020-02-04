@@ -207,9 +207,9 @@ class NeuralNetTrainer(object):
         # Selection criteria here
         selection_threshold = self._noisy_student['selection_threshold']
         condition = (
-            (pseudo_df['gr_max'] > selection_threshold) &
-            #(pseudo_df['vd_max'] > selection_threshold) &
-            #(pseudo_df['cd_max'] > selection_threshold)
+            (pseudo_df['gr_max'] > selection_threshold)
+            #& (pseudo_df['vd_max'] > selection_threshold)
+            #& (pseudo_df['cd_max'] > selection_threshold)
         )
         pseudo_df = pseudo_df.loc[condition]
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
