@@ -164,7 +164,7 @@ class DataGenerator(object):
         self._df['image_id'] = self._df['image_id'].apply(
             lambda x: x + '.jpg'
         )
-        if self._dummies == True:
+        if self._dummies:
             grapheme_root_dummies = np.array(
                 pd.get_dummies(self._df['grapheme_root'])
             )
@@ -181,20 +181,11 @@ class DataGenerator(object):
                 i for i in consonant_diacritic_dummies
             ]
 
-            self._df['grapheme_root_dummies'] = list_grapheme_root_dummies
-            self._df['vowel_diacritic_dummies'] = list_vowel_diacritic_dummies
-            self._df['consonant_diacritic_dummies'] = list_consonant_diacritic_dummies
+            self._df['grapheme_root'] = list_grapheme_root_dummies
+            self._df['vowel_diacritic'] = list_vowel_diacritic_dummies
+            self._df['consonant_diacritic'] = list_consonant_diacritic_dummies
 
-            del self._df['grapheme_root']
-            del self._df['vowel_diacritic']
-            del self._df['consonant_diacritic']
             del self._df['grapheme']
-
-            self._df = self._df.rename(columns={
-                'grapheme_root_dummies': 'grapheme_root',
-                'vowel_diacritic_dummies': 'vowel_diacritic',
-                'consonant_diacritic_dummies': 'consonant_diacritic'
-            })
         else:
             del self._df['grapheme']
 
@@ -306,14 +297,17 @@ class DataGenerator(object):
 
         if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
             cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
-            pseudo_df = pd.concat([self._df.loc[:, cols], pseudo_df], axis=0)
+            df_ = self._df.loc[:, cols]
+            print(df_)
+            pseudo_df = pd.concat([df_, pseudo_df], axis=0)
+
             print(pseudo_df.head(5))
             print(self._df.columns)
             print(pseudo_df.columns)
-            print(np.array(pseudo_df.iloc[0, 'grapheme_root'].values).shape)
-            print(np.array(pseudo_df.iloc[0, 'vowel_diacritic'].values).shape)
-            print(np.array(pseudo_df.iloc[0, 'consonant_diacritic'].values).shape)
-            
+            print(pseudo_df.loc[0, 'grapheme_root'].shape)
+            print(pseudo_df.loc[0, 'vowel_diacritic'].shape)
+            print(pseudo_df.loc[0, 'consonant_diacritic'].shape)
+
             self._train_df, self._valid_df = train_test_split(
                 pseudo_df, test_size=0.15
             )

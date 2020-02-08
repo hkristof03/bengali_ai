@@ -84,6 +84,9 @@ class NeuralNetTrainer(object):
             pseudo_df = self.predict_noisy_student(model, ns_datagen)
             del model
 
+            print("Before NoisyStudentTraining:")
+            print(pseudo_df.head(5))
+
             for i in range(iterations):
                 ns_tr_dg, ns_val_dg = self._datagen.get_datagenerator_noisy_student(pseudo_df)
                 h_dg = self._datagen.get_datagenerator_holdout()
@@ -203,7 +206,7 @@ class NeuralNetTrainer(object):
         cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
         pseudo_df = pseudo_df.loc[:, cols]
         print(f'Selected length: {len(pseudo_df)}')
-        """
+
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.argmax(x)
         )
@@ -233,7 +236,7 @@ class NeuralNetTrainer(object):
         pseudo_df['grapheme_root'] = list_grapheme_root_dummies
         pseudo_df['vowel_diacritic'] = list_vowel_diacritic_dummies
         pseudo_df['consonant_diacritic'] = list_consonant_diacritic_dummies
-        """
+
         return pseudo_df
 
     def predict_test(self):
