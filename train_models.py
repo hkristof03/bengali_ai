@@ -213,6 +213,26 @@ class NeuralNetTrainer(object):
         )
         print(f'Selected length: {len(pseudo_df)}')
 
+        grapheme_root_dummies = np.array(
+            pd.get_dummies(pseudo_df['grapheme_root'])
+        )
+        vowel_diacritic_dummies = np.array(
+            pd.get_dummies(pseudo_df['vowel_diacritic'])
+        )
+        consonant_diacritic_dummies = np.array(
+            pd.get_dummies(pseudo_df['consonant_diacritic'])
+        )
+
+        list_grapheme_root_dummies = [i for i in grapheme_root_dummies]
+        list_vowel_diacritic_dummies = [i for i in vowel_diacritic_dummies]
+        list_consonant_diacritic_dummies = [
+            i for i in consonant_diacritic_dummies
+        ]
+
+        pseudo_df['grapheme_root_dummies'] = list_grapheme_root_dummies
+        pseudo_df['vowel_diacritic_dummies'] = list_vowel_diacritic_dummies
+        pseudo_df['consonant_diacritic_dummies'] = list_consonant_diacritic_dummies
+
         return pseudo_df
 
     def predict_test(self):
