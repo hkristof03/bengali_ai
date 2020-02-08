@@ -200,6 +200,8 @@ class NeuralNetTrainer(object):
             #& (pseudo_df['cd_max'] > selection_threshold)
         )
         pseudo_df = pseudo_df.loc[condition]
+        cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
+        pseudo_df = pseudo_df.iloc[:, cols]
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.argmax(x)
         )
