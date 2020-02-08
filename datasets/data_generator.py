@@ -306,7 +306,7 @@ class DataGenerator(object):
 
         if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
             cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
-            pseudo_df = pd.concat([self._df.iloc[:, cols], pseudo_df], axis=0)
+            pseudo_df = pd.concat([self._df.loc[:, cols], pseudo_df], axis=0)
             print(pseudo_df.head(30))
             print(self._df.columns)
             print(pseudo_df.columns)
