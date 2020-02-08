@@ -60,7 +60,7 @@ class NoisyStudentTrainer(object):
         self.get_callbacks()
         step_size_train = ns_tr_datagen.n / ns_tr_datagen.batch_size
         step_size_valid = ns_val_datagen.n / ns_val_datagen.batch_size
-        model = build_model(**self._model_config)
+        model = build_model(**self._model_config, metrics=metrics_d)
 
         train_history = model.fit(
             ns_tr_datagen,
