@@ -9,13 +9,15 @@ from tensorflow.keras.metrics import Recall, Precision
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
     DataGenerator)
 from models.model_zoo import build_model
+from noisy_student_trainer import NoisyStudentTrainer
+
 
 class NeuralNetTrainer(object):
     """
     """
     base_path = os.path.dirname(os.path.abspath(__file__))
 
-    def __init__(self, **kwargs):
+    def __init__(self, kwargs, noisy_config):
         self._config_all = kwargs   # to store the whole config file and write out with results
         self._preprocess_config = kwargs.get('preprocess')
         self._model_config = kwargs.get('model')
@@ -25,6 +27,7 @@ class NeuralNetTrainer(object):
         self._test_code = kwargs.get('test_code')
         self._cutmix = kwargs.get('cutmix')
         self._noisy_student = kwargs.get('noisy_student')
+        self._noisy_config = noisy_config
         self._datagen = None
         self._callbacks = None
 
@@ -50,7 +53,7 @@ class NeuralNetTrainer(object):
     def train(self):
         """
         """
-        if self._test_code == True:
+        if self._test_code:
             self._train_config['epochs'] = 1
         # if cross_valid: seed??
         self._datagen = DataGenerator(**self._preprocess_config)
@@ -79,31 +82,16 @@ class NeuralNetTrainer(object):
             iterations = self._noisy_student['student_iterations']
             ns_datagen = self._datagen.get_datagenerator_noisy_student()
             pseudo_df = self.predict_noisy_student(model, ns_datagen)
+            del model
+
             for i in range(iterations):
-                ns_tr_gen, ns_val_gen = self._datagen.get_datagenerator_noisy_student(
-                    pseudo_df
-                )
-                step_size_train = ns_tr_gen.n / ns_tr_gen.batch_size
-                step_size_valid = ns_val_gen.n / ns_val_gen.batch_size
-                # Deeper model should come here according to the research
-                model = build_model(**self._model_config, metrics=metrics_d)
-                train_history = model.fit(
-                    ns_tr_gen,
-                    steps_per_epoch=step_size_train,
-                    validation_data=ns_val_gen,
-                    validation_steps=step_size_valid,
-                    callbacks=self._callbacks,
-                    **self._train_config
-                )
+                ns_tr_dg, ns_val_dg = self._datagen.get_datagenerator_noisy_student(pseudo_df)
+                h_dg = self._datagen.get_datagenerator_holdout()
+                ns_trainer = NoisyStudentTrainer(**self._noisy_config)
+                ns_trainer.train_noisy_student(ns_tr_dg, ns_val_dg, h_dg)
                 # ....
-
-        self.predict_holdout(model)
-
-    def train_noisy_student(self):
-        """
-        """
-        pass
-
+        else:
+            self.predict_holdout(model)
 
     def predict_holdout(self, model):
         """
@@ -259,5 +247,8 @@ if __name__ == '__main__':
     path_yaml = DataGenerator.base_path + args.pyaml
     configs = parse_yaml(path_yaml)
 
-    nnt = NeuralNetTrainer(**configs)
+    nnt_config = configs['NeuralNetTrainer']
+    nst_config = configs['NoisyStudentTrainer']
+
+    nnt = NeuralNetTrainer(nnt_config, nst_config)
     nnt.train()

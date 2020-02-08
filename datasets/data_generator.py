@@ -243,7 +243,7 @@ class DataGenerator(object):
             ]
 
         self._train_df, self._valid_df = train_test_split(
-            self._df, test_size=0.15
+            self._df, test_size=0.1
         )
         datagen = ImageDataGenerator(
             **self._datagen_config, rescale=1.0/255.0,
@@ -306,6 +306,7 @@ class DataGenerator(object):
 
         if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
             pseudo_df = pd.concat([self._df, pseudo_df], axis=0)
+            print(psedo_df.head(30))
             self._train_df, self._valid_df = train_test_split(
                 pseudo_df, test_size=0.15
             )
