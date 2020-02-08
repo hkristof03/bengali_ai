@@ -162,7 +162,8 @@ NoisyStudentTrainer:
       filename: '/artifacts/noisy_students/'
     experiment_name: 'efficientnetb3_noisy_student'
 
-  train: 200
+  train:
+    epochs: 200
 
   test_code: True
 
