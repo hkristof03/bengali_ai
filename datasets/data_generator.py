@@ -306,7 +306,9 @@ class DataGenerator(object):
 
         if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
             pseudo_df = pd.concat([self._df, pseudo_df], axis=0)
-            print(psedo_df.head(30))
+            print(pseudo_df.head(30))
+            print(self._df.columns)
+            print(pseudo_df.columns)
             self._train_df, self._valid_df = train_test_split(
                 pseudo_df, test_size=0.15
             )
