@@ -229,9 +229,9 @@ class NeuralNetTrainer(object):
             i for i in consonant_diacritic_dummies
         ]
 
-        pseudo_df['grapheme_root_dummies'] = list_grapheme_root_dummies
-        pseudo_df['vowel_diacritic_dummies'] = list_vowel_diacritic_dummies
-        pseudo_df['consonant_diacritic_dummies'] = list_consonant_diacritic_dummies
+        pseudo_df['grapheme_root'] = list_grapheme_root_dummies
+        pseudo_df['vowel_diacritic'] = list_vowel_diacritic_dummies
+        pseudo_df['consonant_diacritic'] = list_consonant_diacritic_dummies
 
         return pseudo_df
 
