@@ -71,10 +71,6 @@ NeuralNetTrainer:
   model:
     base_model: 'densenet121'
     input_shape: !!python/tuple [160, 160, 3]
-  #  metrics:
-  #    root: recall
-  #    vowel: recall
-  #    consonant: recall
     loss:
       root: 'categorical_crossentropy'
       vowel: 'categorical_crossentropy'
@@ -127,10 +123,6 @@ NoisyStudentTrainer:
   model:
     base_model: 'efficientnetb3'
     input_shape: !!python/tuple [160, 160, 3]
-  #  metrics:
-  #    root: recall
-  #    vowel: recall
-  #    consonant: recall
     loss:
       root: 'categorical_crossentropy'
       vowel: 'categorical_crossentropy'

@@ -307,9 +307,13 @@ class DataGenerator(object):
         if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
             cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
             pseudo_df = pd.concat([self._df.loc[:, cols], pseudo_df], axis=0)
-            print(pseudo_df.head(30))
+            print(pseudo_df.head(5))
             print(self._df.columns)
             print(pseudo_df.columns)
+            print(np.array(pseudo_df.iloc[0, 'grapheme_root'].values).shape)
+            print(np.array(pseudo_df.iloc[0, 'vowel_diacritic'].values).shape)
+            print(np.array(pseudo_df.iloc[0, 'consonant_diacritic'].values).shape)
+            
             self._train_df, self._valid_df = train_test_split(
                 pseudo_df, test_size=0.15
             )
@@ -337,6 +341,16 @@ class DataGenerator(object):
 
         test_generator = datagen.flow_from_directory(**self._test_config)
         return test_generator
+
+
+class NoisySudentDataGenerator(object):
+    """
+    """
+    def __init__(self, ):
+        pass
+
+
+
 
 
 if __name__ == '__main__':
