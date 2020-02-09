@@ -109,8 +109,6 @@ class NoisyStudentTrainer(object):
             datagen, steps=step_size, verbose=1
         )
 
-        print([filenames[:10]])
-
         root_pred = results[0]
         vowel_pred = results[1]
         consonant_pred = results[2]
@@ -124,6 +122,8 @@ class NoisyStudentTrainer(object):
             'consonant_diacritic': consonant_pred
         }
         pseudo_df = pd.DataFrame.from_dict(d)
+        print(pseudo_df.head(5))
+        print(pseudo_df['image_id'][0])
 
         self.select_train_data(pseudo_df, df)
 
@@ -151,10 +151,11 @@ class NoisyStudentTrainer(object):
         )
         pseudo_df = pseudo_df.loc[condition]
         cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
+        df = df.loc[:, cols]
         pseudo_df = pseudo_df.loc[:, cols]
 
         print(f'Selected length: {len(pseudo_df)}')
-        print(pseudo_df['image_id'][:10])
+        print(pseudo_df['image_id'][0])
 
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.argmax(x)
@@ -166,15 +167,7 @@ class NoisyStudentTrainer(object):
             lambda x: np.argmax(x)
         )
 
-        df = df.loc[:, cols]
-
         pseudo_df = pd.concat([df, pseudo_df], axis=0)
         pseudo_df = DataGenerator.get_dummy_targets(pseudo_df)
-
-        print('_'*50)
-        print("Pseudo_df:")
-        print(pseudo_df.loc[:, 'grapheme_root'][0].shape)
-        print(pseudo_df.loc[:, 'vowel_diacritic'][0].shape)
-        print(pseudo_df.loc[:, 'consonant_diacritic'][0].shape)
 
         self._pseudo_df = pseudo_df
