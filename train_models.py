@@ -201,5 +201,5 @@ if __name__ == '__main__':
 
     ns_trainer = NoisyStudentTrainer(**nst_config)
     nn_trainer = NeuralNetTrainer(nnt_config, ns_trainer)
-    nnt.train()
+    nn_trainer.train()
     #print(nst_config.keys())
