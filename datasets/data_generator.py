@@ -296,6 +296,7 @@ class NoisySudentDataGenerator(object):
             self.read_external_df()
         if test_code:
             self._external_df = self._external_df.iloc[:10000]
+        print(self._external_df.head())
         # Teacher never gets noise for predictions!!!
         datagen = ImageDataGenerator(rescale=1.0/255.0)
         nsd = datagen.flow_from_dataframe(
