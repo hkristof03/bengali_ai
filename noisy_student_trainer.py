@@ -98,8 +98,8 @@ class NoisyStudentTrainer(object):
                 lambda x: np.argmax(x)
             )
             self._df = df  # In order to store the original train + validation data
-        else:
-            df = self._df
+
+        df = self._df
         # Itt mindig csak az external_df JÖHET MINT DATAGEN!
         filenames = datagen.filenames
         step_size = datagen.n / datagen.batch_size
@@ -162,22 +162,16 @@ class NoisyStudentTrainer(object):
             lambda x: np.argmax(x)
         )
 
+        cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
+        df = df.loc[:, cols]
+
+        pseudo_df = pd.concat([df, pseudo_df], axis=0)
+        pseudo_df = DataGenerator.get_dummy_targets(pseudo_df)
+
         print('_'*50)
         print("Pseudo_df:")
         print(pseudo_df.loc[:, 'grapheme_root'][0].shape)
         print(pseudo_df.loc[:, 'vowel_diacritic'][0].shape)
         print(pseudo_df.loc[:, 'consonant_diacritic'][0].shape)
-
-        cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
-        df = df.loc[:, cols]
-        
-        print('_'*50)
-        print("df:")
-        print(df.loc[:, 'grapheme_root'][0].shape)
-        print(df.loc[:, 'vowel_diacritic'][0].shape)
-        print(df.loc[:, 'consonant_diacritic'][0].shape)
-
-        pseudo_df = pd.concat([df, pseudo_df], axis=0)
-        pseudo_df = DataGenerator.get_dummy_targets(pseudo_df)
 
         self._pseudo_df = pseudo_df
