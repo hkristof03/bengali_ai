@@ -158,7 +158,7 @@ NoisyStudentTrainer:
 
     callbacks:
       reducelr:
-        monitor: 'val_root_ns_loss'
+        monitor: 'val_root_loss'
         patience: 5
         verbose: 1
         factor: 0.5

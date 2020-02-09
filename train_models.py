@@ -5,6 +5,7 @@ import pandas as pd
 from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
 from tensorflow.keras.metrics import Recall, Precision
+from tensorflow.keras import backend
 
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
     DataGenerator, NoisySudentDataGenerator)
@@ -91,6 +92,7 @@ class NeuralNetTrainer(object):
             )
             del model
             del metrics_d
+            backend.clear_session()
 
             for i in range(iterations):
                 model = self._ns_trainer.train_noisy_student()
