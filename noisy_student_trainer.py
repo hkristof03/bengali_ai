@@ -59,9 +59,9 @@ class NoisyStudentTrainer(object):
         )
 
         metrics_d = {
-            'root': [Recall(name='recall'), Precision(name='precision')],
-            'vowel': [Recall(name='recall'), Precision(name='precision')],
-            'consonant': [Recall(name='recall'), Precision(name='precision')]
+            'root': [Recall(name='ns_recall'), Precision(name='ns_precision')],
+            'vowel': [Recall(name='ns_recall'), Precision(name='ns_precision')],
+            'consonant': [Recall(name='ns_recall'), Precision(name='ns_precision')]
         }
         self.get_callbacks()
         step_size_train = ns_tr_datagen.n / ns_tr_datagen.batch_size

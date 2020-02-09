@@ -158,13 +158,13 @@ NoisyStudentTrainer:
 
     callbacks:
       reducelr:
-        monitor: 'val_root_loss'
+        monitor: 'val_root_ns_loss'
         patience: 5
         verbose: 1
         factor: 0.5
         min_lr: 0.00001
       earlystop:
-        monitor: 'val_root_recall'
+        monitor: 'val_root_ns_recall'
         patience: 10
         min_delta: 0.0
         verbose: 1
@@ -172,7 +172,7 @@ NoisyStudentTrainer:
       modelcp:
         filepath: '/datasets/saved_models/noisy_students/'
         save_best_only: True
-        monitor: 'val_root_recall'
+        monitor: 'val_root_ns_recall'
         mode: 'max'
       csvlog:
         filename: '/artifacts/noisy_students/'
