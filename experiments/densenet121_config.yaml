@@ -53,20 +53,6 @@ NeuralNetTrainer:
       class_mode: !!python/none
       batch_size: 128
     #    seed: 7              # Can be used in Test-Time Augmentation?
-    cutmix: False
-    noisy_student:   # Should be modified! CPY IMAGES TO TRAIN_IMAGES_CROPPED
-    # Maybe cropped images should be perfectly modifeid to original cropping version!!!
-      noisy_student_training: True
-      path_external_df: '/datasets/train_data/external_images.csv'
-      noisy_student_generator:
-        directory: '/datasets/train_images_cropped/'
-        x_col: 'image_id'
-        y_col: !!python/none
-        target_size: !!python/tuple [160, 160]
-        color_mode: 'rgb'
-        shuffle: False
-        class_mode: !!python/none
-        batch_size: 128
 
   model:
     base_model: 'densenet121'
@@ -108,7 +94,6 @@ NeuralNetTrainer:
   noisy_student:
     noisy_student_training: True
     student_iterations: 1
-    selection_threshold: 0.3
 
   test_code: True
 
@@ -120,6 +105,44 @@ NeuralNetTrainer:
 
 
 NoisyStudentTrainer:
+  path_external_df: '/datasets/train_data/external_images.csv'
+  dummies: True
+  augment_predictions: False
+  datagen_config:   # Attributes should be set to False if do not want to augment training!
+    featurewise_center: False    # set input mean to 0 over the dataset
+    samplewise_center: False    # set each sample mean to 0
+    featurewise_std_normalization: False    # divide inputs by std of the dataset
+    samplewise_std_normalization: False    # divide each input by its std
+    zca_whitening: False    # apply ZCA whitening
+    rotation_range: 0.0    # randomly rotate images in the range (degrees, 0 to 180)
+    zoom_range: 0.0    # Randomly zoom image
+    width_shift_range: 0.0    # randomly shift images horizontally (fraction of total width)
+    height_shift_range: 0.0    # randomly shift images vertically (fraction of total height)
+    horizontal_flip: False    # randomly flip images
+    vertical_flip: False    # randomly flip images
+  train_valid_generator:
+    directory: '/datasets/train_images_cropped/'
+    x_col: 'image_id'
+    y_col:
+      - grapheme_root
+      - vowel_diacritic
+      - consonant_diacritic
+    class_mode: 'multi_output'
+    batch_size: 128
+    color_mode: 'rgb'
+    target_size: !!python/tuple [160, 160]
+    shuffle: True
+
+  test_generator:
+    directory: '/datasets/train_images_cropped/'
+    x_col: 'image_id'
+    y_col: !!python/none
+    target_size: !!python/tuple [160, 160]
+    color_mode: 'rgb'
+    shuffle: False
+    class_mode: !!python/none
+    batch_size: 128
+
   model:
     base_model: 'efficientnetb3'
     input_shape: !!python/tuple [160, 160, 3]
@@ -156,6 +179,8 @@ NoisyStudentTrainer:
 
   train:
     epochs: 200
+
+  selection_threshold: 0.3
 
   test_code: True
 

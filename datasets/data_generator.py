@@ -106,7 +106,7 @@ class DataGenerator(object):
 
     def __init__(
         self, path_train_df, path_test_df, dummies, multilabelstratifiedkfold,
-        nfolds, holdout, holdout_size, seed, augment_predictions, cutmix,
+        nfolds, holdout, holdout_size, seed, augment_predictions,
         datagen_config, train_valid_generator, holdout_generator,
         test_generator, noisy_student, **kwargs
         ):
@@ -119,8 +119,6 @@ class DataGenerator(object):
         self._holdout_size = holdout_size
         self._seed = seed
         self._augment_predictions = augment_predictions  # Used not to augment holdout set
-        self._cutmix = cutmix
-        self._noisy_student = noisy_student
         self._datagen_config = datagen_config
         self._trvd_config = train_valid_generator
         self._trvd_config['directory'] = (self.base_path
@@ -135,74 +133,61 @@ class DataGenerator(object):
         self._train_df = None
         self._valid_df = None
         self._holdout_df = None
-        self._external_df = None
+
+    @staticmethod
+    def get_dummy_targets(df):
+            """
+            """
+            grap_dummies = np.array(pd.get_dummies(df['grapheme_root']))
+            vow_dummies = np.array(pd.get_dummies(df['vowel_diacritic']))
+            cons_dummies = np.array(pd.get_dummies(df['consonant_diacritic']))
+
+            list_grap = [i for i in grap_dummies]
+            list_vow = [i for i in vow_dummies]
+            list_cons = [i for i in consonant_diacritic_dummies]
+
+            df['grapheme_root'] = list_grap
+            df['vowel_diacritic'] = list_vow
+            df['consonant_diacritic'] = list_cons
+
+            return df
 
     def parse_train_dataframe(self):
         """
         """
-        self._df = pd.read_csv(self._path_train_df)
+        df = pd.read_csv(self._path_train_df)
 
         if self._multilabelstratifiedkfold:
             from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
-            self._df['id'] = self._df['image_id'].apply(
-                lambda x: int(x.split('_')[1])
-            )
+
+            df['id'] = df['image_id'].apply(lambda x: int(x.split('_')[1]))
             cols = ['id', 'grapheme_root', 'vowel_diacritic',
                 'consonant_diacritic']
-            X, y = self._df[cols].values[:, 0], self._df.values[:, 1:]
-            self._df['fold'] = np.nan
+            X, y = df[cols].values[:, 0], df.values[:, 1:]
+            df['fold'] = np.nan
 
             mskf = MultilabelStratifiedKFold(
                 n_splits=self._nfolds, shuffle=True, random_state=self._seed
             )
             for i, (_, test_index) in enumerate(mskf.split(X, y)):
-                self._df.iloc[test_index, -1] = i
+                df.iloc[test_index, -1] = i
 
-            self._df['fold'] = self._df['fold'].astype('int')
-            del self._df['id']
+            df['fold'] = df['fold'].astype('int')
+            del df['id']
+            df['image_id'] = df['image_id'].apply(lambda x: x + '.jpg')
 
-        self._df['image_id'] = self._df['image_id'].apply(
-            lambda x: x + '.jpg'
-        )
         if self._dummies:
-            grapheme_root_dummies = np.array(
-                pd.get_dummies(self._df['grapheme_root'])
-            )
-            vowel_diacritic_dummies = np.array(
-                pd.get_dummies(self._df['vowel_diacritic'])
-            )
-            consonant_diacritic_dummies = np.array(
-                pd.get_dummies(self._df['consonant_diacritic'])
-            )
+            df = DataGenerator.get_dummy_targets(df)
 
-            list_grapheme_root_dummies = [i for i in grapheme_root_dummies]
-            list_vowel_diacritic_dummies = [i for i in vowel_diacritic_dummies]
-            list_consonant_diacritic_dummies = [
-                i for i in consonant_diacritic_dummies
-            ]
-
-            self._df['grapheme_root'] = list_grapheme_root_dummies
-            self._df['vowel_diacritic'] = list_vowel_diacritic_dummies
-            self._df['consonant_diacritic'] = list_consonant_diacritic_dummies
-
-            del self._df['grapheme']
-        else:
-            del self._df['grapheme']
-
-        if self._noisy_student['noisy_student_training']:
-            self._noisy_student['path_external_df'] = (self.base_path +
-                self._noisy_student['path_external_df'])
-            self._external_df = pd.read_csv(
-                self._noisy_student['path_external_df']
-            )
+        del df['grapheme']
+        self._df = df
 
     def parse_test_dataframe(self):
         """
         """
-        self._df_test = pd.read_csv(self._path_test_df)
-        self._df_test['image_id'] = self._df_test['image_id'].apply(
-            lambda x: x + '.jpg'
-        )
+        df = pd.read_csv(self._path_test_df)
+        df['image_id'] = df['image_id'].apply(lambda x: x + '.jpg')
+        self._df_test = df
 
     def get_datagenerators_train(self):
         """
@@ -239,33 +224,14 @@ class DataGenerator(object):
         datagen = ImageDataGenerator(
             **self._datagen_config, rescale=1.0/255.0,
         )
-        if self._cutmix:
-            #from cutmix_keras import CutMixImageDataGenerator
-            train_generator1 = datagen.flow_from_dataframe(
-                self._train_df, **self._trvd_config
-            )
-            train_generator2 = datagen.flow_from_dataframe(
-                self._train_df, **self._trvd_config
-            )
-            valid_generator = datagen.flow_from_dataframe(
-                self._valid_df, **self._trvd_config
-            )
-            train_generator = CutMixImageDataGenerator(
-                generator1=train_generator1,
-                generator2=train_generator2,
-                img_size=self._trvd_config['target_size'][0],
-                batch_size=self._trvd_config['batch_size']
-            )
-            return train_generator, valid_generator
 
-        else:
-            train_generator = datagen.flow_from_dataframe(
-                self._train_df, **self._trvd_config
-            )
-            valid_generator = datagen.flow_from_dataframe(
-                self._valid_df, **self._trvd_config
-            )
-            return train_generator, valid_generator
+        train_generator = datagen.flow_from_dataframe(
+            self._train_df, **self._trvd_config
+        )
+        valid_generator = datagen.flow_from_dataframe(
+            self._valid_df, **self._trvd_config
+        )
+        return train_generator, valid_generator
 
     def get_datagenerator_holdout(self):
         """
@@ -282,45 +248,6 @@ class DataGenerator(object):
                 self._holdout_df, **self._holdout_config
             )
             return holdout_datagen
-
-    def get_datagenerator_noisy_student(self, pseudo_df=pd.DataFrame()):
-        """
-        """
-        if (self._noisy_student['noisy_student_training'] and pseudo_df.empty):
-            # Teacher never gets noise for predictions!!!
-            datagen = ImageDataGenerator(rescale=1.0/255.0)
-            nsd = datagen.flow_from_dataframe(
-                self._external_df,
-                **self._noisy_student['noisy_student_generator']
-            )
-            return nsd
-
-        if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
-            cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
-            df_ = self._df.loc[:, cols]
-            print(df_)
-            pseudo_df = pd.concat([df_, pseudo_df], axis=0)
-
-            print(pseudo_df.head(5))
-            print(self._df.columns)
-            print(pseudo_df.columns)
-            print(pseudo_df.loc[0, 'grapheme_root'].shape)
-            print(pseudo_df.loc[0, 'vowel_diacritic'].shape)
-            print(pseudo_df.loc[0, 'consonant_diacritic'].shape)
-
-            self._train_df, self._valid_df = train_test_split(
-                pseudo_df, test_size=0.15
-            )
-            datagen = ImageDataGenerator(
-                **self._datagen_config, rescale=1.0/255.0
-            )
-            nsd_tr = datagen.flow_from_dataframe(
-                self._train_df, **self._trvd_config
-            )
-            nsd_val = datagen.flow_from_dataframe(
-                self._valid_df, **self._trvd_config
-            )
-            return nsd_tr, nsd_val
 
     def get_datagenerator_test(self):
         """
@@ -340,8 +267,55 @@ class DataGenerator(object):
 class NoisySudentDataGenerator(object):
     """
     """
-    def __init__(self, ):
-        pass
+    base_path = DataGenerator.base_path
+
+    def __init__(
+        self, path_external_df, dummies, datagen_config,
+        tr_val_config, test_config,
+        ):
+        self._path_external_df = path_external_df
+        self._dummies = dummies
+        self._datagen_config = datagen_config
+        self._tr_val_config = tr_val_config
+        self._test_config = test_config
+        self._external_df = pd.DataFrame()
+
+    def read_external_df(self):
+        """
+        """
+        self._noisy_student['path_external_df'] = (self.base_path +
+            self._noisy_student['path_external_df'])
+        self._external_df = pd.read_csv(self._noisy_student['path_external_df'])
+
+    def get_datagenerator_test(self):
+        """
+        """
+        if not self._external_df.empty:
+            self.read_external_df()
+        # Teacher never gets noise for predictions!!!
+        datagen = ImageDataGenerator(rescale=1.0/255.0)
+        nsd = datagen.flow_from_dataframe(
+            self.external_df,
+            **self._test_config
+        )
+        return nsd
+
+    def get_datagenerator_train(pseudo_df):
+        """
+        """
+        train_df, valid_df = train_test_split(
+            pseudo_df, test_size=0.15
+        )
+        datagen = ImageDataGenerator(
+            **self._datagen_config, rescale=1.0/255.0
+        )
+        ns_tr_datagen = datagen.flow_from_dataframe(
+            train_df, **self._tr_val_config
+        )
+        ns_val_datagen = datagen.flow_from_dataframe(
+            valid_df, **self._tr_val_config
+        )
+        return ns_tr_datagen, ns_val_datagen
 
 
 

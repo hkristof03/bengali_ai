@@ -7,7 +7,7 @@ from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
 from tensorflow.keras.metrics import Recall, Precision
 
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
-    DataGenerator)
+    DataGenerator, NoisySudentDataGenerator)
 from models.model_zoo import build_model
 
 
@@ -16,14 +16,18 @@ class NoisyStudentTrainer(object):
     """
     base_path = os.path.dirname(os.path.abspath(__file__))
 
-    def __init__(self, **kwargs):
-        self._config_all = kwargs
-        self._model_config = kwargs.get('model')
-        self._callbacks_config = kwargs.get('callbacks')
-        self._train_config = kwargs.get('train')
-        self._test_config = kwargs.get('test')
-        self._test_code = kwargs.get('test_code')
+    def __init__(self, datagen, trainer, **kwargs):
+        #self._config_all = kwargs
+        self._model_config = trainer.get('model')
+        self._callbacks_config = trainer.get('callbacks')
+        self._train_config = trainer.get('train')
+        self._selection_threshold = trainer.get('selection_threshold')
+        self._test_config = trainer.get('test')
+        self._test_code = trainer.get('test_code')
+        self._datagen = NoisySudentDataGenerator(**datagen)
         self._callbacks = None
+        self._df = None
+        self._pseudo_df = None
 
     def get_callbacks(self):
         """
@@ -44,13 +48,15 @@ class NoisyStudentTrainer(object):
         csvlog = CSVLogger(**self._callbacks_config['csvlog'])
         self._callbacks = [reduce_lr, earlystop, checkpoint, csvlog]
 
-    def train_noisy_student(
-        self, ns_tr_datagen, ns_val_datagen, holdout_datagen=None
-        ):
+    def train_noisy_student(self):
         """
         """
         if self._test_code:
             self._train_config['epochs'] = 1
+
+        ns_tr_datagen, ns_val_datagen =  self._datagen.get_datagenerator_train(
+            self._pseudo_df
+        )
 
         metrics_d = {
             'root': [Recall(name='recall'), Precision(name='precision')],
@@ -70,64 +76,82 @@ class NoisyStudentTrainer(object):
             callbacks=self._callbacks,
             **self._train_config
         )
-        if holdout_datagen:
-            self.predict_holdout(model, holdout_datagen)
+        ns_test_datagen = self._datagen.get_datagenerator_test()
+        self.predict_teacher(model, ns_test_datagen)
+
+        return model
 
 
-    def predict_holdout(self, model, holdout_datagen):
+    def predict_teacher(self, model, datagen, df=pd.DataFrame()):
         """
         """
-        filenames = holdout_datagen.filenames
-        step_size_holdout = holdout_datagen.n / holdout_datagen.batch_size
-
+        if not df.empty:
+            self._df = df  # In order to store the original train + validation data
+        else:
+            df = self._df
+        # Itt mindig csak az external_df JÖHET MINT DATAGEN!
+        filenames = datagen.filenames
+        step_size = datagen.n / datagen.batch_size
         metrics_names = model.metrics_names
-        results = model.evaluate(
-            holdout_datagen, steps=step_size_holdout
-        )
-        results = [float(i) for i in results]
-        d = dict(zip(metrics_names, results))
-        scores = [
-            d['root_recall'], d['vowel_recall'], d['consonant_recall']
-        ]
-        hma_recall = float(np.average(scores, weights=[2,1,1]))
-        d['hier_macro_avg_recall'] = hma_recall
-        self._config_all['results'] = d
-        path_results = (self.base_path
-            + self._test_config['path_save_config']
-            + self._callbacks_config['experiment_name'] + '.yaml')
-        dump_dict_yaml(self._config_all, path_results)
-
-        # Get arrays of predictions for later analysis
         results = model.predict(
-            holdout_datagen, steps=step_size_holdout, verbose=1
+            datagen, steps=step_size, verbose=1
         )
         root_pred = results[0]
         vowel_pred = results[1]
         consonant_pred = results[2]
-
-        root_pred = np.argmax(i, axis=1)
-        vowel_pred = np.argmax(i, axis=1)
-        consonant_pred = np.argmax(i, axis=1)
-
+        root_pred = [i for i in root_pred]
+        vowel_pred = [i for i in vowel_pred]
+        consonant_pred = [i for i in consonant_pred]
         d = {
             'image_id': filenames,
-            'root_pred': root_pred,
-            'vowel_pred': vowel_pred,
-            'consonant_pred': consonant_pred
+            'grapheme_root': root_pred,
+            'vowel_diacritic': vowel_pred,
+            'consonant_diacritic': consonant_pred
         }
-        df_pred = pd.DataFrame.from_dict(d)
-        df_pred = df_pred.merge(
-            self._datagen._holdout_df,
-            how='left',
-            on='image_id'
+        pseudo_df = pd.DataFrame.from_dict(d)
+
+        self.select_train_data(pseudo_df, df)
+
+
+    def select_train_data(self, pseudo_df, df):
+        """
+        """
+        print(f'Original length: {len(pseudo_df)}')
+        pseudo_df['gr_max'] = pseudo_df['grapheme_root'].apply(
+            lambda x: np.amax(x)
         )
-        cols = ['grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
-        for col in cols:
-            df_pred[col] = df_pred[col].apply(lambda x: np.argmax(x))
+        pseudo_df['vd_max'] = pseudo_df['vowel_diacritic'].apply(
+            lambda x: np.amax(x)
+        )
+        pseudo_df['cd_max'] = pseudo_df['consonant_diacritic'].apply(
+            lambda x: np.amax(x)
+        )
+        # Selection criteria here
+        selection_threshold = self._noisy_student['selection_threshold']
+        condition = (
+            (pseudo_df['gr_max'] > selection_threshold)
+            #& (pseudo_df['vd_max'] > selection_threshold)
+            #& (pseudo_df['cd_max'] > selection_threshold)
+        )
+        pseudo_df = pseudo_df.loc[condition]
+        cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
+        pseudo_df = pseudo_df.loc[:, cols]
+        print(f'Selected length: {len(pseudo_df)}')
 
-        path_predictions = (self.base_path
-            + self._test_config['path_predictions']
-            + self._callbacks_config['experiment_name'] + '.csv')
-        df_pred.to_csv(path_predictions, index=False)
+        pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
+            lambda x: np.argmax(x)
+        )
+        pseudo_df.loc[:, 'vowel_diacritic'] = pseudo_df['vowel_diacritic'].apply(
+            lambda x: np.argmax(x)
+        )
+        pseudo_df.loc[:, 'consonant_diacritic'] = pseudo_df['consonant_diacritic'].apply(
+            lambda x: np.argmax(x)
+        )
+        pseudo_df = DataGenerator.get_dummy_targets(pseudo_df)
 
-        ## Returns holdout df here in order to train a last model
+        cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
+        df = df.loc[:, cols]
+
+        pseudo_df = pd.concat([df, pseudo_df], axis=0)
+
+        self._pseudo_df = pseudo_df

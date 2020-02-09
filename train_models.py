@@ -7,7 +7,7 @@ from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
 from tensorflow.keras.metrics import Recall, Precision
 
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
-    DataGenerator)
+    DataGenerator, NoisySudentDataGenerator)
 from models.model_zoo import build_model
 from noisy_student_trainer import NoisyStudentTrainer
 
@@ -17,7 +17,7 @@ class NeuralNetTrainer(object):
     """
     base_path = os.path.dirname(os.path.abspath(__file__))
 
-    def __init__(self, kwargs, noisy_config):
+    def __init__(self, kwargs, ns_trainer):
         self._config_all = kwargs   # to store the whole config file and write out with results
         self._preprocess_config = kwargs.get('preprocess')
         self._model_config = kwargs.get('model')
@@ -25,9 +25,8 @@ class NeuralNetTrainer(object):
         self._train_config = kwargs.get('train')
         self._test_config = kwargs.get('test')
         self._test_code = kwargs.get('test_code')
-        self._cutmix = kwargs.get('cutmix')
         self._noisy_student = kwargs.get('noisy_student')
-        self._noisy_config = noisy_config
+        self._ns_trainer = ns_trainer
         self._datagen = None
         self._callbacks = None
 
@@ -80,21 +79,19 @@ class NeuralNetTrainer(object):
 
         if self._noisy_student['noisy_student_training']:
             iterations = self._noisy_student['student_iterations']
-            ns_datagen = self._datagen.get_datagenerator_noisy_student()
-            pseudo_df = self.predict_noisy_student(model, ns_datagen)
+            ns_datagen_test = self.ns_trainer._datagen.get_datagenerator_test()
+            ns_trainer.predict_teacher(
+                model,
+                ns_datagen_test,
+                self._datagen._df   # Ez a train + valid DF -> itt kapja meg először és utoljára
+            )
             del model
 
-            print("Before NoisyStudentTraining:")
-            print(pseudo_df.head(5))
-
             for i in range(iterations):
-                ns_tr_dg, ns_val_dg = self._datagen.get_datagenerator_noisy_student(pseudo_df)
-                h_dg = self._datagen.get_datagenerator_holdout()
-                ns_trainer = NoisyStudentTrainer(**self._noisy_config)
-                ns_trainer.train_noisy_student(ns_tr_dg, ns_val_dg, h_dg)
+                model = self._ns_trainer.train_noisy_student()
                 # ....
-        else:
-            self.predict_holdout(model)
+
+        self.predict_holdout(model)
 
     def predict_holdout(self, model):
         """
@@ -163,81 +160,6 @@ class NeuralNetTrainer(object):
                 + self._callbacks_config['experiment_name'] + '.csv')
             df_pred.to_csv(path_predictions, index=False)
 
-    def predict_noisy_student(self, model, ns_datagen):
-        """
-        """
-        filenames = ns_datagen.filenames
-        step_size_ns = ns_datagen.n / ns_datagen.batch_size
-        metrics_names = model.metrics_names
-        results = model.predict(
-            ns_datagen, steps=step_size_ns, verbose=1
-        )
-        root_pred = results[0]
-        vowel_pred = results[1]
-        consonant_pred = results[2]
-        root_pred = [i for i in root_pred]
-        vowel_pred = [i for i in vowel_pred]
-        consonant_pred = [i for i in consonant_pred]
-        d = {
-            'image_id': filenames,
-            'grapheme_root': root_pred,
-            'vowel_diacritic': vowel_pred,
-            'consonant_diacritic': consonant_pred
-        }
-        pseudo_df = pd.DataFrame.from_dict(d)
-        print(f'Original length: {len(pseudo_df)}')
-        pseudo_df['gr_max'] = pseudo_df['grapheme_root'].apply(
-            lambda x: np.amax(x)
-        )
-        pseudo_df['vd_max'] = pseudo_df['vowel_diacritic'].apply(
-            lambda x: np.amax(x)
-        )
-        pseudo_df['cd_max'] = pseudo_df['consonant_diacritic'].apply(
-            lambda x: np.amax(x)
-        )
-        # Selection criteria here
-        selection_threshold = self._noisy_student['selection_threshold']
-        condition = (
-            (pseudo_df['gr_max'] > selection_threshold)
-            #& (pseudo_df['vd_max'] > selection_threshold)
-            #& (pseudo_df['cd_max'] > selection_threshold)
-        )
-        pseudo_df = pseudo_df.loc[condition]
-        cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
-        pseudo_df = pseudo_df.loc[:, cols]
-        print(f'Selected length: {len(pseudo_df)}')
-
-        pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
-            lambda x: np.argmax(x)
-        )
-        pseudo_df.loc[:, 'vowel_diacritic'] = pseudo_df['vowel_diacritic'].apply(
-            lambda x: np.argmax(x)
-        )
-        pseudo_df.loc[:, 'consonant_diacritic'] = pseudo_df['consonant_diacritic'].apply(
-            lambda x: np.argmax(x)
-        )
-
-        grapheme_root_dummies = np.array(
-            pd.get_dummies(pseudo_df['grapheme_root'])
-        )
-        vowel_diacritic_dummies = np.array(
-            pd.get_dummies(pseudo_df['vowel_diacritic'])
-        )
-        consonant_diacritic_dummies = np.array(
-            pd.get_dummies(pseudo_df['consonant_diacritic'])
-        )
-
-        list_grapheme_root_dummies = [i for i in grapheme_root_dummies]
-        list_vowel_diacritic_dummies = [i for i in vowel_diacritic_dummies]
-        list_consonant_diacritic_dummies = [
-            i for i in consonant_diacritic_dummies
-        ]
-
-        pseudo_df['grapheme_root'] = list_grapheme_root_dummies
-        pseudo_df['vowel_diacritic'] = list_vowel_diacritic_dummies
-        pseudo_df['consonant_diacritic'] = list_consonant_diacritic_dummies
-
-        return pseudo_df
 
     def predict_test(self):
         """
@@ -276,5 +198,6 @@ if __name__ == '__main__':
     nnt_config = configs['NeuralNetTrainer']
     nst_config = configs['NoisyStudentTrainer']
 
-    nnt = NeuralNetTrainer(nnt_config, nst_config)
+    ns_trainer = NoisyStudentTrainer(**nst_config)
+    nn_trainer = NeuralNetTrainer(nnt_config, ns_trainer)
     nnt.train()
