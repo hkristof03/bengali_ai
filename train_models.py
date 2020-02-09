@@ -90,6 +90,7 @@ class NeuralNetTrainer(object):
                 self._datagen._df   # Ez a train + valid DF -> itt kapja meg először és utoljára
             )
             del model
+            del metrics_d
 
             for i in range(iterations):
                 model = self._ns_trainer.train_noisy_student()

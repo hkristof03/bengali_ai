@@ -68,6 +68,8 @@ class NoisyStudentTrainer(object):
         step_size_valid = ns_val_datagen.n / ns_val_datagen.batch_size
         model = build_model(**self._model_config, metrics=metrics_d)
 
+        print(model.metrics_names)
+
         train_history = model.fit(
             ns_tr_datagen,
             steps_per_epoch=step_size_train,
