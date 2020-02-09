@@ -219,7 +219,7 @@ class DataGenerator(object):
             ]
 
         if test_code:
-            self._df = self._df.iloc[:10000]
+            self._df = self._df.iloc[:8000]
 
         self._train_df, self._valid_df = train_test_split(
             self._df, test_size=0.1
