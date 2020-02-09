@@ -189,7 +189,7 @@ class DataGenerator(object):
         df['image_id'] = df['image_id'].apply(lambda x: x + '.jpg')
         self._df_test = df
 
-    def get_datagenerators_train(self):
+    def get_datagenerators_train(self, test_code=False):
         """
         """
         self.parse_train_dataframe()
@@ -217,6 +217,9 @@ class DataGenerator(object):
             self._df = self._df.loc[
                 (~self._df.index.isin(self._holdout_df.index))
             ]
+
+        if test_code:
+            self._df = self._df.iloc[:10000]
 
         self._train_df, self._valid_df = train_test_split(
             self._df, test_size=0.1
@@ -286,15 +289,17 @@ class NoisySudentDataGenerator(object):
         self._path_external_df = (self.base_path + self._path_external_df)
         self._external_df = pd.read_csv(self._noisy_student['path_external_df'])
 
-    def get_datagenerator_test(self):
+    def get_datagenerator_test(self, test_code=False):
         """
         """
         if not self._external_df.empty:
             self.read_external_df()
+        if test_code:
+            self._external_df = self._external_df.iloc[:10000]
         # Teacher never gets noise for predictions!!!
         datagen = ImageDataGenerator(rescale=1.0/255.0)
         nsd = datagen.flow_from_dataframe(
-            self.external_df,
+            self._external_df,
             **self._test_config
         )
         return nsd

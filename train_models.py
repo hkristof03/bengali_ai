@@ -56,7 +56,9 @@ class NeuralNetTrainer(object):
             self._train_config['epochs'] = 1
         # if cross_valid: seed??
         self._datagen = DataGenerator(**self._preprocess_config)
-        train_gen, valid_gen = self._datagen.get_datagenerators_train()
+        train_gen, valid_gen = self._datagen.get_datagenerators_train(
+            self._test_code
+        )
         step_size_train = train_gen.n / train_gen.batch_size
         step_size_valid = valid_gen.n / valid_gen.batch_size
         self.get_callbacks()
@@ -79,7 +81,9 @@ class NeuralNetTrainer(object):
 
         if self._noisy_student['noisy_student_training']:
             iterations = self._noisy_student['student_iterations']
-            ns_datagen_test = self.ns_trainer._datagen.get_datagenerator_test()
+            ns_datagen_test = self._ns_trainer._datagen.get_datagenerator_test(
+                self._test_code
+            )
             ns_trainer.predict_teacher(
                 model,
                 ns_datagen_test,
