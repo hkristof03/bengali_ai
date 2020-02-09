@@ -156,6 +156,7 @@ class NoisyStudentTrainer(object):
 
         print(f'Selected length: {len(pseudo_df)}')
         print(pseudo_df['image_id'][0])
+        print(df['image_id'][0])
 
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.argmax(x)
