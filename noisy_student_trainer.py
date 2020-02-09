@@ -127,7 +127,7 @@ class NoisyStudentTrainer(object):
             lambda x: np.amax(x)
         )
         # Selection criteria here
-        selection_threshold = self._noisy_student['selection_threshold']
+        selection_threshold = self._selection_threshold
         condition = (
             (pseudo_df['gr_max'] > selection_threshold)
             #& (pseudo_df['vd_max'] > selection_threshold)
