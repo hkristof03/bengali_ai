@@ -109,6 +109,8 @@ class NoisyStudentTrainer(object):
             datagen, steps=step_size, verbose=1
         )
 
+        print([filenames[:10]])
+
         root_pred = results[0]
         vowel_pred = results[1]
         consonant_pred = results[2]
@@ -150,7 +152,9 @@ class NoisyStudentTrainer(object):
         pseudo_df = pseudo_df.loc[condition]
         cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
         pseudo_df = pseudo_df.loc[:, cols]
+
         print(f'Selected length: {len(pseudo_df)}')
+        print(pseudo_df['image_id'][:10])
 
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.argmax(x)
@@ -162,7 +166,6 @@ class NoisyStudentTrainer(object):
             lambda x: np.argmax(x)
         )
 
-        cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
         df = df.loc[:, cols]
 
         pseudo_df = pd.concat([df, pseudo_df], axis=0)
