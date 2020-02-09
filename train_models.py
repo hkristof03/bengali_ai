@@ -191,6 +191,7 @@ class NeuralNetTrainer(object):
 
 
 if __name__ == '__main__':
+
     args = parse_args()
     path_yaml = DataGenerator.base_path + args.pyaml
     configs = parse_yaml(path_yaml)
@@ -201,3 +202,4 @@ if __name__ == '__main__':
     ns_trainer = NoisyStudentTrainer(**nst_config)
     nn_trainer = NeuralNetTrainer(nnt_config, ns_trainer)
     nnt.train()
+    #print(nst_config.keys())

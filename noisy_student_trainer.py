@@ -16,7 +16,7 @@ class NoisyStudentTrainer(object):
     """
     base_path = os.path.dirname(os.path.abspath(__file__))
 
-    def __init__(self, datagen, trainer, **kwargs):
+    def __init__(self, datagen, trainer):
         #self._config_all = kwargs
         self._model_config = trainer.get('model')
         self._callbacks_config = trainer.get('callbacks')

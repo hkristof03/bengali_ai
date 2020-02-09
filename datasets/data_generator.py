@@ -271,13 +271,13 @@ class NoisySudentDataGenerator(object):
 
     def __init__(
         self, path_external_df, dummies, datagen_config,
-        tr_val_config, test_config,
+        train_valid_generator, test_generator,
         ):
         self._path_external_df = path_external_df
         self._dummies = dummies
         self._datagen_config = datagen_config
-        self._tr_val_config = tr_val_config
-        self._test_config = test_config
+        self._tr_val_config = train_valid_generator
+        self._test_config = test_generator
         self._external_df = pd.DataFrame()
 
     def read_external_df(self):
