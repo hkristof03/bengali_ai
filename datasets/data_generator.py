@@ -298,15 +298,15 @@ class DataGenerator(object):
         if (self._noisy_student['noisy_student_training'] and not pseudo_df.empty):
             cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
             df_ = self._df.loc[:, cols]
-            print(df_)
+            #print(df_.head(5))
             pseudo_df = pd.concat([df_, pseudo_df], axis=0)
 
-            print(pseudo_df.head(5))
-            print(self._df.columns)
-            print(pseudo_df.columns)
-            print(pseudo_df.loc[0, 'grapheme_root'].shape)
-            print(pseudo_df.loc[0, 'vowel_diacritic'].shape)
-            print(pseudo_df.loc[0, 'consonant_diacritic'].shape)
+            #print(pseudo_df.head(5))
+            #print(self._df.columns)
+            #print(pseudo_df.columns)
+            #print(pseudo_df.loc[0, 'grapheme_root'].shape)
+            #print(pseudo_df.loc[0, 'vowel_diacritic'].shape)
+            #print(pseudo_df.loc[0, 'consonant_diacritic'].shape)
 
             self._train_df, self._valid_df = train_test_split(
                 pseudo_df, test_size=0.15
