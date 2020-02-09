@@ -88,6 +88,15 @@ class NoisyStudentTrainer(object):
         """
         """
         if not df.empty:
+            df.loc[:, 'grapheme_root'] = df['grapheme_root'].apply(
+                lambda x: np.argmax(x)
+            )
+            df.loc[:, 'vowel_diacritic'] = df['vowel_diacritic'].apply(
+                lambda x: np.argmax(x)
+            )
+            df.loc[:, 'consonant_diacritic'] = df['consonant_diacritic'].apply(
+                lambda x: np.argmax(x)
+            )
             self._df = df  # In order to store the original train + validation data
         else:
             df = self._df
@@ -95,9 +104,11 @@ class NoisyStudentTrainer(object):
         filenames = datagen.filenames
         step_size = datagen.n / datagen.batch_size
         metrics_names = model.metrics_names
+
         results = model.predict(
             datagen, steps=step_size, verbose=1
         )
+
         root_pred = results[0]
         vowel_pred = results[1]
         consonant_pred = results[2]
@@ -119,6 +130,7 @@ class NoisyStudentTrainer(object):
         """
         """
         print(f'Original length: {len(pseudo_df)}')
+
         pseudo_df['gr_max'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.amax(x)
         )
@@ -149,7 +161,6 @@ class NoisyStudentTrainer(object):
         pseudo_df.loc[:, 'consonant_diacritic'] = pseudo_df['consonant_diacritic'].apply(
             lambda x: np.argmax(x)
         )
-        pseudo_df = DataGenerator.get_dummy_targets(pseudo_df)
 
         print('_'*50)
         print("Pseudo_df:")
@@ -159,7 +170,7 @@ class NoisyStudentTrainer(object):
 
         cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
         df = df.loc[:, cols]
-
+        
         print('_'*50)
         print("df:")
         print(df.loc[:, 'grapheme_root'][0].shape)
@@ -167,5 +178,6 @@ class NoisyStudentTrainer(object):
         print(df.loc[:, 'consonant_diacritic'][0].shape)
 
         pseudo_df = pd.concat([df, pseudo_df], axis=0)
+        pseudo_df = DataGenerator.get_dummy_targets(pseudo_df)
 
         self._pseudo_df = pseudo_df
