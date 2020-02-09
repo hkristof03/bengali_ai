@@ -95,7 +95,7 @@ NeuralNetTrainer:
     noisy_student_training: True
     student_iterations: 1
 
-  test_code: True
+  test_code: False
 
   test:
     tta: False
@@ -181,9 +181,9 @@ NoisyStudentTrainer:
     train:
       epochs: 200
 
-    selection_threshold: 0.0003
+    selection_threshold: 0.3
 
-    test_code: True
+    test_code: False
 
     test:
       path_save_config: '/datasets/predictions_config/noisy_students/'
