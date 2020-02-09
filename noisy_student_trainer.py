@@ -153,10 +153,6 @@ class NoisyStudentTrainer(object):
         pseudo_df = pseudo_df.loc[:, cols]
 
         print(f'Selected length: {len(pseudo_df)}')
-        print('_' * 50)
-        print(df.head())
-        print(df['image_id'][0])
-        print(df['image_id'][6])
 
         pseudo_df.loc[:, 'grapheme_root'] = pseudo_df['grapheme_root'].apply(
             lambda x: np.argmax(x)
