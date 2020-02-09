@@ -93,7 +93,7 @@ NeuralNetTrainer:
 
   noisy_student:
     noisy_student_training: True
-    student_iterations: 1
+    student_iterations: 2
 
   test_code: True
 
@@ -164,7 +164,7 @@ NoisyStudentTrainer:
         factor: 0.5
         min_lr: 0.00001
       earlystop:
-        monitor: 'val_root_ns_recall'
+        monitor: 'val_root_recall'
         patience: 10
         min_delta: 0.0
         verbose: 1
@@ -172,7 +172,7 @@ NoisyStudentTrainer:
       modelcp:
         filepath: '/datasets/saved_models/noisy_students/'
         save_best_only: True
-        monitor: 'val_root_ns_recall'
+        monitor: 'val_root_recall'
         mode: 'max'
       csvlog:
         filename: '/artifacts/noisy_students/'
