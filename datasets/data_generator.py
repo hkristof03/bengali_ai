@@ -144,7 +144,7 @@ class DataGenerator(object):
 
             list_grap = [i for i in grap_dummies]
             list_vow = [i for i in vow_dummies]
-            list_cons = [i for i in consonant_diacritic_dummies]
+            list_cons = [i for i in cons_dummies]
 
             df['grapheme_root'] = list_grap
             df['vowel_diacritic'] = list_vow
