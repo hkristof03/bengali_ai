@@ -142,9 +142,9 @@ class NeuralNetTrainer(object):
             vowel_pred = results[1]
             consonant_pred = results[2]
 
-            root_pred = np.argmax(root_pred, axis=0)
-            vowel_pred = np.argmax(vowel_pred, axis=0)
-            consonant_pred = np.argmax(consonant_pred, axis=0)
+            root_pred = [np.argmax(i) for i in root_pred]
+            vowel_pred = [np.argmax(i) for i in vowel_pred]
+            consonant_pred = [np.argmax(i) for i in consonant_pred]
 
             d = {
                 'image_id': filenames,
