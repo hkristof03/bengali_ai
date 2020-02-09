@@ -304,7 +304,7 @@ class NoisySudentDataGenerator(object):
         )
         return nsd
 
-    def get_datagenerator_train(pseudo_df):
+    def get_datagenerator_train(self, pseudo_df):
         """
         """
         train_df, valid_df = train_test_split(
