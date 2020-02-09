@@ -36,7 +36,6 @@ class NoisyStudentTrainer(object):
         exp_name = self._callbacks_config['experiment_name']
         mcp_fp = self._callbacks_config['modelcp']['filepath']
         csv_fn = self._callbacks_config['csvlog']['filename']
-        print(csv_fn)
 
         mcp_fp = bp + mcp_fp +  exp_name + '.h5'
         csv_fn = bp + csv_fn + exp_name + '.csv'
@@ -55,6 +54,9 @@ class NoisyStudentTrainer(object):
         if self._test_code:
             self._train_config['epochs'] = 1
 
+        if not self._callbacks:
+            self.get_callbacks()
+
         ns_tr_datagen, ns_val_datagen =  self._datagen.get_datagenerator_train(
             self._pseudo_df
         )
@@ -64,7 +66,6 @@ class NoisyStudentTrainer(object):
             'vowel': [Recall(name='recall'), Precision(name='precision')],
             'consonant': [Recall(name='recall'), Precision(name='precision')]
         }
-        self.get_callbacks()
         step_size_train = ns_tr_datagen.n / ns_tr_datagen.batch_size
         step_size_valid = ns_val_datagen.n / ns_val_datagen.batch_size
         model = build_model(**self._model_config, metrics=metrics_d)

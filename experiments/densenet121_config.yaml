@@ -176,7 +176,7 @@ NoisyStudentTrainer:
         mode: 'max'
       csvlog:
         filename: '/artifacts/noisy_students/'
-      experiment_name: 'efficientnetb3_noisy_student'
+      experiment_name: 'efficientnetb3_ns'
 
     train:
       epochs: 200
