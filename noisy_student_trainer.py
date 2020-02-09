@@ -32,15 +32,16 @@ class NoisyStudentTrainer(object):
     def get_callbacks(self):
         """
         """
-        bp = self.base_path
-        exp_name = self._callbacks_config['experiment_name']
-        mcp_fp = self._callbacks_config['modelcp']['filepath']
-        csv_fn = self._callbacks_config['csvlog']['filename']
+        if not self._callbacks:
+            bp = self.base_path
+            exp_name = self._callbacks_config['experiment_name']
+            mcp_fp = self._callbacks_config['modelcp']['filepath']
+            csv_fn = self._callbacks_config['csvlog']['filename']
 
-        mcp_fp = bp + mcp_fp +  exp_name + '.h5'
-        csv_fn = bp + csv_fn + exp_name + '.csv'
-        self._callbacks_config['modelcp']['filepath'] = mcp_fp
-        self._callbacks_config['csvlog']['filename'] = csv_fn
+            mcp_fp = bp + mcp_fp +  exp_name + '.h5'
+            csv_fn = bp + csv_fn + exp_name + '.csv'
+            self._callbacks_config['modelcp']['filepath'] = mcp_fp
+            self._callbacks_config['csvlog']['filename'] = csv_fn
 
         reduce_lr = ReduceLROnPlateau(**self._callbacks_config['reducelr'])
         earlystop = EarlyStopping(**self._callbacks_config['earlystop'])
@@ -54,8 +55,7 @@ class NoisyStudentTrainer(object):
         if self._test_code:
             self._train_config['epochs'] = 1
 
-        if not self._callbacks:
-            self.get_callbacks()
+        self.get_callbacks()
 
         ns_tr_datagen, ns_val_datagen =  self._datagen.get_datagenerator_train(
             self._pseudo_df
