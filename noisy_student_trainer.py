@@ -161,10 +161,10 @@ class NoisyStudentTrainer(object):
         df = df.loc[:, cols]
 
         print('_'*50)
-        print("df_:")
-        print(df_.loc[:, 'grapheme_root'][0].shape)
-        print(df_.loc[:, 'vowel_diacritic'][0].shape)
-        print(df_.loc[:, 'consonant_diacritic'][0].shape)
+        print("df:")
+        print(df.loc[:, 'grapheme_root'][0].shape)
+        print(df.loc[:, 'vowel_diacritic'][0].shape)
+        print(df.loc[:, 'consonant_diacritic'][0].shape)
 
         pseudo_df = pd.concat([df, pseudo_df], axis=0)
 
