@@ -5,6 +5,7 @@ import pandas as pd
 from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
 from tensorflow.keras.metrics import Recall, Precision
+from tensorflow.keras.models import load_model
 
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
     DataGenerator, NoisySudentDataGenerator)
@@ -79,6 +80,8 @@ class NoisyStudentTrainer(object):
             **self._train_config
         )
         ns_test_datagen = self._datagen.get_datagenerator_test()
+
+        model = load_model(self._callbacks_config['modelcp']['filepath'])
         self.predict_teacher(model, ns_test_datagen)
 
         return model

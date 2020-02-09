@@ -5,6 +5,7 @@ import pandas as pd
 from tensorflow.keras.callbacks import (ReduceLROnPlateau, ModelCheckpoint,
     CSVLogger, EarlyStopping)
 from tensorflow.keras.metrics import Recall, Precision
+from tensorflow.keras.models import load_model
 from tensorflow.keras import backend
 
 from datasets.data_generator import (parse_args, parse_yaml, dump_dict_yaml,
@@ -85,6 +86,7 @@ class NeuralNetTrainer(object):
             ns_datagen_test = self._ns_trainer._datagen.get_datagenerator_test(
                 self._test_code
             )
+            model =
             ns_trainer.predict_teacher(
                 model,
                 ns_datagen_test,

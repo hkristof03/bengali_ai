@@ -25,7 +25,10 @@ def parse_yaml(path_yaml):
         return configs
 
 
-def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
+def build_model(
+    base_model, input_shape, metrics,
+    loss, loss_weights, learning_rate, **kwargs
+    ):
 
     if base_model == 'resnet50':
         from tensorflow.keras.applications import ResNet50
@@ -99,7 +102,7 @@ def build_model(base_model, input_shape, metrics, loss, loss_weights, **kwargs):
 
     model = Model(inputs=x_in, outputs=[out_grapheme, out_vowel, out_consonant])
     model.compile(
-        Adam(lr=0.0001),
+        Adam(lr=learning_rate), # 0.0001
         metrics=metrics,
         loss=loss,
         loss_weights=loss_weights
