@@ -32,10 +32,11 @@ class NoisyStudentTrainer(object):
     def get_callbacks(self):
         """
         """
-        bp = NoisyStudentTrainer.base_path
+        bp = self.base_path
         exp_name = self._callbacks_config['experiment_name']
         mcp_fp = self._callbacks_config['modelcp']['filepath']
         csv_fn = self._callbacks_config['csvlog']['filename']
+        print(csv_fn)
 
         mcp_fp = bp + mcp_fp +  exp_name + '.h5'
         csv_fn = bp + csv_fn + exp_name + '.csv'
