@@ -108,7 +108,7 @@ class DataGenerator(object):
         self, path_train_df, path_test_df, dummies, multilabelstratifiedkfold,
         nfolds, holdout, holdout_size, seed, augment_predictions,
         datagen_config, train_valid_generator, holdout_generator,
-        test_generator, noisy_student, **kwargs
+        test_generator, **kwargs
         ):
         self._path_train_df = self.base_path + path_train_df
         self._path_test_df = self.base_path + path_test_df
@@ -283,8 +283,7 @@ class NoisySudentDataGenerator(object):
     def read_external_df(self):
         """
         """
-        self._noisy_student['path_external_df'] = (self.base_path +
-            self._noisy_student['path_external_df'])
+        self._path_external_df = (self.base_path + self._path_external_df)
         self._external_df = pd.read_csv(self._noisy_student['path_external_df'])
 
     def get_datagenerator_test(self):
