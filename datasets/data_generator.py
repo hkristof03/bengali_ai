@@ -287,7 +287,7 @@ class NoisySudentDataGenerator(object):
         """
         """
         self._path_external_df = (self.base_path + self._path_external_df)
-        self._external_df = pd.read_csv(self._noisy_student['path_external_df'])
+        self._external_df = pd.read_csv(self._path_external_df)
 
     def get_datagenerator_test(self, test_code=False):
         """
