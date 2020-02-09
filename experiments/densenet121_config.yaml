@@ -181,7 +181,7 @@ NoisyStudentTrainer:
     train:
       epochs: 200
 
-    selection_threshold: 0.3
+    selection_threshold: 0.0001
 
     test_code: True
 
