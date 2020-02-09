@@ -151,8 +151,20 @@ class NoisyStudentTrainer(object):
         )
         pseudo_df = DataGenerator.get_dummy_targets(pseudo_df)
 
+        print('_'*50)
+        print("Pseudo_df:")
+        print(pseudo_df.loc[:, 'grapheme_root'][0].shape)
+        print(pseudo_df.loc[:, 'vowel_diacritic'][0].shape)
+        print(pseudo_df.loc[:, 'consonant_diacritic'][0].shape)
+
         cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
         df = df.loc[:, cols]
+
+        print('_'*50)
+        print("df_:")
+        print(df_.loc[:, 'grapheme_root'][0].shape)
+        print(df_.loc[:, 'vowel_diacritic'][0].shape)
+        print(df_.loc[:, 'consonant_diacritic'][0].shape)
 
         pseudo_df = pd.concat([df, pseudo_df], axis=0)
 
