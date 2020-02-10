@@ -72,21 +72,23 @@ class NeuralNetTrainer(object):
         }
 
         model = build_model(**self._model_config, metrics=metrics_d)
-        train_history = model.fit(
-            train_gen,
-            steps_per_epoch=step_size_train,
-            validation_data=valid_gen,
-            validation_steps=step_size_valid,
-            callbacks=self._callbacks,
-            **self._train_config
-        )
+
+        if not self._noisy_student['load_model']:
+            train_history = model.fit(
+                train_gen,
+                steps_per_epoch=step_size_train,
+                validation_data=valid_gen,
+                validation_steps=step_size_valid,
+                callbacks=self._callbacks,
+                **self._train_config
+            )
 
         if self._noisy_student['noisy_student_training']:
             iterations = self._noisy_student['student_iterations']
             ns_datagen_test = self._ns_trainer._datagen.get_datagenerator_test(
                 self._test_code
             )
-            model =
+            model = load_model(self._callbacks_config['modelcp']['filepath'])
             ns_trainer.predict_teacher(
                 model,
                 ns_datagen_test,

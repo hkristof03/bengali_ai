@@ -95,6 +95,7 @@ NeuralNetTrainer:
   noisy_student:
     noisy_student_training: True
     student_iterations: 1
+    load_model: True
 
   test_code: False
 
