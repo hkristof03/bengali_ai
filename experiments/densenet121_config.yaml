@@ -32,7 +32,7 @@ NeuralNetTrainer:
       class_mode: 'multi_output'
       batch_size: 128
       color_mode: 'rgb'
-      target_size: !!python/tuple [160, 160]
+      target_size: !!python/tuple [128, 128]
       shuffle: True
     holdout_generator:
       directory: '/datasets/train_images_cropped/'
@@ -44,11 +44,11 @@ NeuralNetTrainer:
       class_mode: 'multi_output'
       batch_size: 128
       color_mode: 'rgb'
-      target_size: !!python/tuple [160, 160]
+      target_size: !!python/tuple [128, 128]
       shuffle: False
     test_generator:
       directory: '/data/test_images/'
-      target_size: !!python/tuple [160, 160]
+      target_size: !!python/tuple [128, 128]
       shuffle: False
       class_mode: !!python/none
       batch_size: 128
@@ -56,7 +56,7 @@ NeuralNetTrainer:
 
   model:
     base_model: 'densenet121'
-    input_shape: !!python/tuple [160, 160, 3]
+    input_shape: !!python/tuple [128, 128, 3]
     loss:
       root: 'categorical_crossentropy'
       vowel: 'categorical_crossentropy'
@@ -132,14 +132,14 @@ NoisyStudentTrainer:
       class_mode: 'multi_output'
       batch_size: 128
       color_mode: 'rgb'
-      target_size: !!python/tuple [160, 160]
+      target_size: !!python/tuple [128, 128]
       shuffle: True
 
     test_generator:
       directory: '/datasets/train_images_cropped/'
       x_col: 'image_id'
       y_col: !!python/none
-      target_size: !!python/tuple [160, 160]
+      target_size: !!python/tuple [128, 128]
       color_mode: 'rgb'
       shuffle: False
       class_mode: !!python/none
@@ -148,7 +148,7 @@ NoisyStudentTrainer:
   trainer:
     model:
       base_model: 'efficientnetb3'
-      input_shape: !!python/tuple [160, 160, 3]
+      input_shape: !!python/tuple [128, 128, 3]
       loss:
         root: 'categorical_crossentropy'
         vowel: 'categorical_crossentropy'
@@ -168,8 +168,8 @@ NoisyStudentTrainer:
         min_lr: 0.00001
       earlystop:
         monitor: 'val_root_recall'
-        patience: 10
-        min_delta: 0.0
+        patience: 5
+        min_delta: 0.009
         verbose: 1
         mode: 'max'
       modelcp:
@@ -184,7 +184,7 @@ NoisyStudentTrainer:
     train:
       epochs: 200
 
-    selection_threshold: 0.3
+    selection_threshold: 0.6
 
     test_code: False
 

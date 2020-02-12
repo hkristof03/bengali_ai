@@ -147,8 +147,8 @@ class NoisyStudentTrainer(object):
         selection_threshold = self._selection_threshold
         condition = (
             (pseudo_df['gr_max'] > selection_threshold)
-            #& (pseudo_df['vd_max'] > selection_threshold)
-            #& (pseudo_df['cd_max'] > selection_threshold)
+            & (pseudo_df['vd_max'] > selection_threshold)
+            & (pseudo_df['cd_max'] > selection_threshold)
         )
         pseudo_df = pseudo_df.loc[condition]
         cols = ['image_id', 'grapheme_root', 'vowel_diacritic', 'consonant_diacritic']
