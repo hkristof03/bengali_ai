@@ -127,6 +127,9 @@ class NeuralNetTrainer(object):
             )
             results = [float(i) for i in results]
             d = dict(zip(metrics_names, results))
+
+            print(d)
+            
             scores = [
                 d['root_recall'], d['vowel_recall'], d['consonant_recall']
             ]

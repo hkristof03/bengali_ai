@@ -24,6 +24,7 @@ class NoisyStudentTrainer(object):
         self._train_config = trainer.get('train')
         self._selection_threshold = trainer.get('selection_threshold')
         self._test_config = trainer.get('test')
+        self._load_model = trainer.get('load_model')
         self._test_code = trainer.get('test_code')
         self._datagen = NoisySudentDataGenerator(**datagen)
         self._callbacks = None
@@ -71,14 +72,15 @@ class NoisyStudentTrainer(object):
         step_size_valid = ns_val_datagen.n / ns_val_datagen.batch_size
         model = build_model(**self._model_config, metrics=metrics_d)
 
-        train_history = model.fit(
-            ns_tr_datagen,
-            steps_per_epoch=step_size_train,
-            validation_data=ns_val_datagen,
-            validation_steps=step_size_valid,
-            callbacks=self._callbacks,
-            **self._train_config
-        )
+        if not self._load_model:
+            train_history = model.fit(
+                ns_tr_datagen,
+                steps_per_epoch=step_size_train,
+                validation_data=ns_val_datagen,
+                validation_steps=step_size_valid,
+                callbacks=self._callbacks,
+                **self._train_config
+            )
         ns_test_datagen = self._datagen.get_datagenerator_test()
 
         model = load_model(self._callbacks_config['modelcp']['filepath'])

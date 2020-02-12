@@ -186,6 +186,7 @@ NoisyStudentTrainer:
 
     selection_threshold: 0.6
 
+    load_model: True
     test_code: False
 
     test:
